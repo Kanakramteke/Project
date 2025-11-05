@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom small utilities */
+:root{--container:1100px}
+
+/* Fallback styles for body if Tailwind hasn't loaded yet */
+html,body{height:100%}
+body{margin:0}
