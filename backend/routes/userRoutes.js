@@ -1,20 +1,27 @@
-// ...existing code...
+const express = require('express');
+const router = express.Router();
+const User = require('../models/User'); // make sure you have models/User.js created
+
+// POST → create a new user
 router.post('/', async (req, res) => {
-  console.log('POST /api/users body:', req.body);
-
-  const body = req.body || {};
-  const { name, email, password } = body;
-
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: 'name, email and password are required' });
-  }
-
   try {
-    // ...existing user creation code...
-    res.status(201).json({ message: 'User created' }); // example success
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    const { name, email, password } = req.body;
+    const newUser = new User({ name, email, password });
+    await newUser.save();
+    res.status(201).json({ message: 'User created successfully', user: newUser });
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating user', error: error.message });
   }
 });
-// ...existing code...
+
+// GET → fetch all users
+router.get('/', async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching users', error: error.message });
+  }
+});
+
+module.exports = router;

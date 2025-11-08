@@ -1,26 +1,9 @@
-const express = require('express');
-const router = express.Router();
+const mongoose = require('mongoose');
 
-// Temporary in-memory user list (no DB yet)
-const users = [];
-
-// POST /api/users
-router.post('/', (req, res) => {
-  const { name, email, password } = req.body;
-
-  if (!name || !email || !password) {
-    return res.status(400).json({ message: 'All fields are required' });
-  }
-
-  const newUser = { id: users.length + 1, name, email, password };
-  users.push(newUser);
-
-  res.status(201).json(newUser);
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true }
 });
 
-// GET /api/users
-router.get('/', (req, res) => {
-  res.json(users);
-});
-
-module.exports = router;
+module.exports = mongoose.model('User', userSchema);
