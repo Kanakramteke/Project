@@ -24,8 +24,6 @@ export default function LandingPage({ userName, onNavigate, onCommunityCreated }
     { id: 'communities', label: 'Communities', onClick: () => onNavigate && onNavigate('communities') },
     { id: 'discussions', label: 'Discussions', onClick: () => onNavigate && onNavigate('discussions') },
     { id: 'form-teams', label: 'Form Teams', onClick: () => setShowTeamsModal(true) },
-    { id: 'questions', label: 'Ask Questions', onClick: () => onNavigate && onNavigate('questions') },
-    { id: 'collaborate', label: 'Collaborate', onClick: () => onNavigate && onNavigate('collaborate') },
   ]
 
   function Icon({ children, src }){
