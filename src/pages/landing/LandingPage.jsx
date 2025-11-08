@@ -1,75 +1,90 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import CreateModal from '../create/CreateModal'
+import TeamsPage from '../teams/TeamsPage'
 
-function Icon({ children, src }){
-  if (src) {
-    return <img src={src} alt="logo" className="w-10 h-10 rounded-lg object-cover shadow-md" />
-  }
-  return (
-    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center text-white font-bold shadow-md text-base">{children}</div>
-  )
-}
-
-function NavIcon({ children, label }){
-  return (
-    <button title={label} aria-label={label} className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-lg">
-      {children}
-    </button>
-  )
-}
-
-const quickLink = (label, icon) => (
-  <button className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 hover:shadow md:text-sm">
-    <span className="text-lg">{icon}</span>
-    <span className="font-semibold text-slate-700">{label}</span>
-  </button>
-)
-
-const Card = ({ title, color, children, ctaLabel }) => (
-  <div className="rounded-2xl bg-white shadow-md ring-1 ring-slate-200 p-5 flex flex-col">
-    <div className="flex items-center justify-between mb-3">
-      <h3 className="font-bold text-slate-900">{title}</h3>
-      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-    </div>
-    <div className="text-slate-600 flex-1">{children}</div>
-    {ctaLabel && (
-      <div className="mt-4">
-        <button className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white shadow" style={{ backgroundColor: color }}>
-          {ctaLabel}
-        </button>
-      </div>
-    )}
-  </div>
-)
-
-export default function LandingPage({ userName }){
+export default function LandingPage({ userName, onNavigate, onCommunityCreated }){
   const [menuOpen, setMenuOpen] = useState(false)
+  const headerRef = useRef(null)
+  const [headerHeight, setHeaderHeight] = useState(64)
+
+  useEffect(() => {
+    function updateHeight() {
+      if (headerRef.current) setHeaderHeight(headerRef.current.offsetHeight)
+    }
+    updateHeight()
+    window.addEventListener('resize', updateHeight)
+    return () => window.removeEventListener('resize', updateHeight)
+  }, [])
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showTeamsModal, setShowTeamsModal] = useState(false)
+
+  const quickNav = [
+    { id: 'events', label: 'Events', onClick: () => onNavigate && onNavigate('events') },
+    { id: 'communities', label: 'Communities', onClick: () => onNavigate && onNavigate('communities') },
+    { id: 'discussions', label: 'Discussions', onClick: () => onNavigate && onNavigate('discussions') },
+    { id: 'form-teams', label: 'Form Teams', onClick: () => setShowTeamsModal(true) },
+    { id: 'questions', label: 'Ask Questions', onClick: () => onNavigate && onNavigate('questions') },
+    { id: 'collaborate', label: 'Collaborate', onClick: () => onNavigate && onNavigate('collaborate') },
+  ]
+
+  function Icon({ children, src }){
+    if (src) {
+      return <img src={src} alt="logo" className="w-10 h-10 rounded-lg object-cover shadow-md" />
+    }
+    return (
+      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center text-white font-bold shadow-md text-base">{children}</div>
+    )
+  }
+  const cards = [
+    { key: 'events', title: 'Events', img: '/events.jpg', desc: 'Explore upcoming hackathons, mentorship drives, and innovation challenges. Your next big idea might begin at one of these events!' },
+    { key: 'communities', title: 'Communities', img: '/communities.jpg', desc: 'Communities bring together students who share the same passion — whether it’s art, nature, tech, studies, or sports. Join a group that inspires you, collaborate on ideas, and grow with people who dream the same way you do.' },
+    { key: 'discussions', title: 'Discussions', img: '/discussion.webp', desc: 'Engage in meaningful conversations, share your thoughts, and learn from others in the community.' },
+    { key: 'form-teams', title: 'Form Teams', img: '/teams.jpg', desc: 'Build teams that think, create, and innovate together. From brainstorming concepts to completing projects — teamwork turns imagination into achievement.', onClick: () => setShowTeamsModal(true) },
+    { key: 'questions', title: 'Ask Questions', img: '/questions.jpg', desc: 'Don’t just wonder — ask. Share your questions, solve doubts, and contribute your knowledge to help the community grow.' },
+    { key: 'collaborate', title: 'Collaborate', img: '/collaborate.avif', desc: 'Join hands with peers to bring ideas to life. From social work to innovation projects, collaboration turns small efforts into meaningful change.' },
+  ]
 
   return (
-    <div className="min-h-screen">
-      {/* Top Navigation */}
-      <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center gap-4">
+    <div className="min-h-screen bg-slate-50">
+  <header ref={headerRef} className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
+            <div className="max-w-full px-6 py-5 md:py-6 flex items-center justify-between">
+          {/* Left: Logo and Name */}
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => onNavigate && onNavigate('landing')}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            >
+              <Icon src="/logo.png">CC</Icon>
+              <span className="font-extrabold text-3xl md:text-4xl text-slate-900">CampusConnect</span>
+            </button>
+          </div>
+
+          {/* Right: Navigation Buttons, Quick Nav and Profile */}
           <div className="flex items-center gap-3">
-            <Icon src="/logo.png">CC</Icon>
-            <span className="font-extrabold text-xl text-slate-900">CampusConnect</span>
-          </div>
-          <div className="flex-1">
-            <div className="relative">
-              <input className="w-full md:w-2/3 lg:w-1/2 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="Search communities, events, or students…" />
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+            <div className="hidden lg:flex items-center gap-4">
+              <div className="hidden lg:flex items-center gap-3">
+                {quickNav.map((n) => (
+                  <button
+                    key={n.id}
+                    onClick={n.onClick}
+                    className={`px-5 py-2.5 rounded-lg font-bold text-base transition-colors ${n.id === 'events' ? 'bg-cyan-500 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}
+                  >
+                    {n.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="hidden md:flex items-center gap-3">
-            <NavIcon label="Home">🏠</NavIcon>
-            <NavIcon label="Messages">💬</NavIcon>
-            <NavIcon label="Communities">👥</NavIcon>
-            <NavIcon label="Calendar">📅</NavIcon>
-            <NavIcon label="Notifications">🔔</NavIcon>
+
+            <button className="w-12 h-12 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors" title="Wishlist">
+              <span className="text-2xl">❤️</span>
+            </button>
+            <button className="w-12 h-12 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors" title="Notifications">
+              <span className="text-2xl">🔔</span>
+            </button>
             <div className="relative">
-              <button onClick={()=>setMenuOpen(v=>!v)} className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200">
-                <span className="w-8 h-8 rounded-full bg-slate-300 grid place-items-center">{userName?.[0] || 'U'}</span>
-                <span className="font-semibold text-slate-700">{userName}</span>
+              <button onClick={()=>setMenuOpen(v=>!v)} className="w-14 h-14 rounded-full bg-slate-300 grid place-items-center hover:bg-slate-400 transition-colors">
+                <span className="text-2xl font-bold text-slate-700">{userName?.[0] || 'U'}</span>
               </button>
               <AnimatePresence>
                 {menuOpen && (
@@ -83,80 +98,122 @@ export default function LandingPage({ userName }){
             </div>
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero */}
-      <section className="max-w-7xl mx-auto px-6 py-8">
-        <div className="rounded-2xl bg-white shadow ring-1 ring-slate-200 p-6 flex flex-col md:flex-row items-center gap-6">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-sky-500 to-sky-600 text-white font-bold grid place-items-center text-2xl">{userName?.[0] || 'U'}</div>
-          <div className="flex-1">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900">Welcome back, {userName}!</h1>
-            <p className="text-slate-600">Your campus world at a glance.</p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              {quickLink('Edit Profile','✏️')}
-              {quickLink('Your Activity','📈')}
-              {quickLink('Your Communities','🎓')}
+      <main className="max-w-6xl mx-auto px-6 py-10 md:pl-80">
+        <div className="flex gap-6">
+          {/* Left Sidebar - fixed to extreme left on md+ */}
+          <aside
+            className="hidden md:block fixed left-0 w-80"
+            style={{ top: `${headerHeight}px`, height: `calc(100vh - ${headerHeight}px)` }}
+          >
+            <div className="bg-white shadow-lg p-4 h-full overflow-auto">
+              <nav className="space-y-2">
+                <button 
+                  onClick={() => setShowCreateModal(true)}
+                  className="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-100 font-semibold text-slate-700 transition-colors flex items-center gap-3"
+                >
+                  <span className="text-xl">➕</span>
+                  <span>Create</span>
+                </button>
+                <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-100 font-semibold text-slate-700 transition-colors flex items-center gap-3">
+                  <span className="text-xl">📊</span>
+                  <span>Your Activity</span>
+                </button>
+                <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-100 font-semibold text-slate-700 transition-colors flex items-center gap-3">
+                  <span className="text-xl">📅</span>
+                  <span>Calendar</span>
+                </button>
+                <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-100 font-semibold text-slate-700 transition-colors flex items-center gap-3">
+                  <span className="text-xl">🔍</span>
+                  <span>Discover</span>
+                </button>
+                <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-100 font-semibold text-slate-700 transition-colors flex items-center gap-3">
+                  <span className="text-xl">💾</span>
+                  <span>Saved Items</span>
+                </button>
+                <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-100 font-semibold text-slate-700 transition-colors flex items-center gap-3">
+                  <span className="text-xl">❓</span>
+                  <span>Help/Support</span>
+                </button>
+              </nav>
             </div>
-          </div>
-        </div>
-      </section>
+          </aside>
 
-      {/* Content Grid */}
-      <section className="max-w-7xl mx-auto px-6 pb-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card title="Join Communities" color="#4CAF50" ctaLabel="Join Now">
-            <ul className="list-disc pl-4 space-y-1">
-              <li>AI Innovators Club</li>
-              <li>Hackathon Network</li>
-              <li>Art Society</li>
-            </ul>
-          </Card>
-          <Card title="Campus Calendar" color="#2196F3" ctaLabel="View Full Calendar">
-            <ul className="space-y-1">
-              <li>Fri 5: Robotics Meetup</li>
-              <li>Sat 6: Design Workshop</li>
-              <li>Tue 9: Alumni Talk</li>
-            </ul>
-          </Card>
-          <Card title="Discover Students" color="#7C3AED" ctaLabel="Connect">
-            <ul className="space-y-1">
-              <li>Priya • AI/ML</li>
-              <li>Rahul • Design</li>
-              <li>Aisha • Web Dev</li>
-            </ul>
-          </Card>
-          <Card title="Opportunities" color="#FF9800" ctaLabel="Explore">
-            <ul className="space-y-1">
-              <li>Internship: Campus Ambassador</li>
-              <li>Grant: Student Innovation Fund</li>
-              <li>Competition: Hack the Future</li>
-            </ul>
-          </Card>
+          {/* Main content area - push by sidebar on md+ */}
+          <div className="flex-1">
+            {/* Quick Navigation - visible only on mobile and tablet */}
+            <div className="block md:hidden mb-4">
+              {quickNav.map((n) => (
+                <button
+                  key={n.id}
+                  onClick={n.onClick}
+                  className={`w-full px-4 py-2 rounded-md text-base transition-colors font-medium ${n.id === 'events' ? 'bg-cyan-600 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-800'}`}
+                >
+                  {n.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Cards Section - Discover and Join */}
+<section className="px-6 pb-16">
+  <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {cards.map((card) => (
+      <div
+        key={card.key}
+        className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow cursor-pointer relative"
+        onClick={card.onClick}
+      >
+        <img src={card.img} alt={card.title} className="w-full h-48 object-cover" />
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-slate-800 mb-2 text-center">{card.title}</h3>
+          <p className="text-sm text-slate-600 text-center">{card.desc}</p>
         </div>
-        {/* Side Panel */}
-        <aside className="space-y-6">
-          <div className="rounded-2xl bg-white shadow ring-1 ring-slate-200 p-5">
-            <h3 className="font-bold text-slate-900 mb-2">Trending discussions 💬</h3>
-            <ul className="space-y-1 text-slate-600">
-              <li>Best laptops for CS students?</li>
-              <li>How to crack GSoC?</li>
-              <li>Share your portfolio!</li>
-            </ul>
+      </div>
+    ))}
+  </div>
+</section>
           </div>
-          <div className="rounded-2xl bg-white shadow ring-1 ring-slate-200 p-5">
-            <h3 className="font-bold text-slate-900 mb-2">Top mentors 🌟</h3>
-            <ul className="space-y-1 text-slate-600">
-              <li>Dr. Mehta — AI</li>
-              <li>Ms. Kapoor — UX</li>
-              <li>Mr. Iyer — Web</li>
-            </ul>
-          </div>
-          <div className="rounded-2xl bg-white shadow ring-1 ring-slate-200 p-5">
-            <h3 className="font-bold text-slate-900 mb-2">Quick tips 💡</h3>
-            <p className="text-slate-600">Join 2-3 clubs that match your goals. Show up, connect, and share!</p>
-          </div>
-        </aside>
-      </section>
+        </div>
+      </main>
+
+      {/* Create Modal used by sidebar */}
+      <CreateModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onEventCreated={(ev) => {
+          alert('Event published successfully!');
+          setShowCreateModal(false);
+        }}
+        onCommunityCreated={(c) => {
+          if (onCommunityCreated) onCommunityCreated(c);
+          setShowCreateModal(false);
+        }}
+      />
+
+      {/* Teams Modal */}
+      <AnimatePresence>
+        {showTeamsModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center px-4 py-8"
+            onClick={() => setShowTeamsModal(false)}
+          >
+            <motion.div
+              initial={{ y: 40, opacity: 0, scale: 0.98 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 20, opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+              className="w-full max-w-4xl max-h-[85vh] rounded-2xl bg-white shadow-2xl overflow-hidden flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <TeamsPage />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
-  )
+  );
 }

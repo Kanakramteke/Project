@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import EventsPage from './pages/events/EventsPage'
+import CommunitiesPage from './pages/communities/CommunitiesPage'
 import LandingPage from './pages/landing/LandingPage'
+import DiscussionsPage from './pages/discussions/DiscussionsPage'
 
 function LoginModal({ open, onClose, onSuccess }){
   if (!open) return null
@@ -480,6 +483,16 @@ export default function App(){
   const [signUpOpen, setSignUpOpen] = useState(false)
   const [isAuthed, setIsAuthed] = useState(false)
   const [userName, setUserName] = useState('Kanak')
+  const [currentPage, setCurrentPage] = useState('events')
+  const [createdCommunities, setCreatedCommunities] = useState([])
+
+  const handleCommunityCreatedApp = (newCommunity) => {
+    setCreatedCommunities(prev => [newCommunity, ...prev])
+    // navigate to communities view so user sees it
+    setCurrentPage('communities')
+    // optional notification
+    // alert('Community created — it appears in Explore Communities')
+  }
 
   useEffect(() => {
     const root = document.documentElement
@@ -504,12 +517,19 @@ export default function App(){
   const handleSignUpSuccess = ({ name }) => {
     if (name) setUserName(name)
     setIsAuthed(true)
+    // show the landing page after successful sign up
+    setCurrentPage('landing')
   }
 
   return (
     <div className={isAuthed ? "min-h-screen bg-gradient-to-br from-[#F9FAFB] to-[#E3F2FD]" : "min-h-screen bg-gradient-to-br from-slate-50 via-white to-primary/5 dark:from-slate-950 dark:via-slate-900 dark:to-primary/10"}>
       {isAuthed ? (
-        <LandingPage userName={userName} />
+        <>
+          {currentPage === 'landing' && <LandingPage userName={userName} onNavigate={setCurrentPage} onCommunityCreated={handleCommunityCreatedApp} />}
+          {currentPage === 'events' && <EventsPage userName={userName} onNavigate={setCurrentPage} onCommunityCreated={handleCommunityCreatedApp} />}
+          {currentPage === 'communities' && <CommunitiesPage onNavigate={setCurrentPage} createdCommunities={createdCommunities} />}
+          {currentPage === 'discussions' && <DiscussionsPage isOpen={true} onClose={() => setCurrentPage('landing')} />}
+        </>
       ) : (
         <>
           <Header theme={theme} toggleTheme={toggleTheme} onLoginClick={() => setLoginOpen(true)} />
