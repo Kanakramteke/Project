@@ -130,8 +130,6 @@ export default function CommunitiesPage({ userName, onNavigate, createdCommuniti
     { id: 'communities', label: 'Communities', onClick: () => onNavigate && onNavigate('communities') },
     { id: 'discussions', label: 'Discussions', onClick: () => onNavigate && onNavigate('discussions') },
     { id: 'teams', label: 'Form Teams', onClick: () => onNavigate && onNavigate('teams') },
-    { id: 'questions', label: 'Ask Questions', onClick: () => onNavigate && onNavigate('questions') },
-    { id: 'collaborate', label: 'Collaborate', onClick: () => onNavigate && onNavigate('collaborate') },
   ];
 
   return (
