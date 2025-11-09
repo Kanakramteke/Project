@@ -267,7 +267,7 @@ function SignUpModal({ open, onClose, onSuccess }){
               {confirmPasswordError && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{confirmPasswordError}</p>}
             </div>
 
-            <button type="submit" className="w-full inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-semibold px-5 py-3 rounded-xl shadow-md">Create Account</button>
+            <button type="submit" className="w-full inline-flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-5 py-3 rounded-xl shadow-md">Create Account</button>
 
             <div className="relative text-center">
               <span className="px-3 text-xs text-slate-400 bg-white dark:bg-slate-900 relative z-10">or sign up with</span>
