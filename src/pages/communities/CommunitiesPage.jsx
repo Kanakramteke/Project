@@ -4,10 +4,10 @@ import CreateModal from '../create/CreateModal';
 
 function Icon({ children, src }) {
   if (src) {
-    return <img src={src} alt="logo" className="w-10 h-10 rounded-lg object-cover shadow-md" />;
+    return <img src={src} alt="logo" className="w-20 h-20 rounded-lg object-cover shadow-md" />; // Increased size to 20x20
   }
   return (
-    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center text-white font-bold shadow-md text-base">{children}</div>
+    <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center text-white font-bold shadow-md text-base">{children}</div>
   );
 }
 
@@ -110,8 +110,19 @@ export default function CommunitiesPage({ userName, onNavigate, createdCommuniti
   const [requestSent, setRequestSent] = useState({})
   const [menuOpen, setMenuOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const all = [...createdCommunities, ...defaultCommunities]
+
+  const filteredCommunities = all
+    .filter((community) =>
+      community.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      const aMatch = a.name.toLowerCase().startsWith(searchQuery.toLowerCase());
+      const bMatch = b.name.toLowerCase().startsWith(searchQuery.toLowerCase());
+      return bMatch - aMatch;
+    });
 
   const handleJoin = (community) => {
     if (community.joinType === 'Approval') {
@@ -133,24 +144,24 @@ export default function CommunitiesPage({ userName, onNavigate, createdCommuniti
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: '#ECE4D7' }}>
       {/* Top Navigation */}
-      <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
-        <div className="max-w-full px-6 py-5 md:py-6 flex items-center justify-between">
+      <nav className="sticky top-0 z-40" style={{ backgroundColor: '#EBE2DB' }}>
+        <div className="max-w-full px-6 py-2 md:py-3 flex items-center justify-between border-b-4 border-black backdrop-blur">
           {/* Left: Logo and Name */}
           <div className="flex items-center gap-2">
             <button 
               onClick={() => onNavigate && onNavigate('landing')}
-              className="mr-2 p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              className="mr-2 p-0.5 rounded-lg hover:bg-slate-100 transition-colors"
               title="Back to Home"
             >
               <span className="text-2xl">←</span>
             </button>
             <button 
               onClick={() => onNavigate && onNavigate('landing')}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              className="flex items-center gap-1 hover:opacity-80 transition-opacity"
             >
-              <Icon src="/logo.png">CC</Icon>
+              <Icon src="/images/logo.png" />
               <span className="font-extrabold text-2xl md:text-3xl text-slate-900">CampusConnect</span>
             </button>
           </div>
@@ -195,8 +206,8 @@ export default function CommunitiesPage({ userName, onNavigate, createdCommuniti
       {/* Main Content with Sidebar */}
       <div className="flex gap-6">
         {/* Left Sidebar Panel - Full Length */}
-        <aside className="w-80 flex-shrink-0">
-          <div className="bg-white shadow-lg p-4 min-h-screen">
+        <aside className="w-80 flex-shrink-0" style={{ backgroundColor: '#F8F3EA' }}>
+          <div className="shadow-lg p-4 min-h-screen">
             <nav className="space-y-2">
               <button 
                 onClick={() => setShowCreateModal(true)}
@@ -245,37 +256,43 @@ export default function CommunitiesPage({ userName, onNavigate, createdCommuniti
                 type="text" 
                 className="w-full rounded-3xl bg-white shadow-xl ring-1 ring-slate-200 pl-16 pr-6 py-6 text-xl focus:outline-none focus:ring-2 focus:ring-primary" 
                 placeholder="Search communities..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
               <span className="absolute left-6 top-1/2 -translate-y-1/2 text-3xl text-slate-400">🔍</span>
             </div>
           </section>
 
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {all.slice(0, 6).map((c) => (
-              <motion.div key={c.id} whileHover={{ scale: 1.02 }} className="bg-white rounded-xl shadow p-4 cursor-pointer" onClick={() => setSelectedCommunity(c)}>
-                <div className="h-64 w-full overflow-hidden rounded-md mb-3 bg-slate-100">
-                  <img 
-                    src={c.image} 
-                    alt={c.name} 
-                    className="w-full h-64 object-cover" 
-                    style={{ filter: 'none', transform: 'none' }} 
-                  />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900">{c.name}</h3>
-                <p className="text-sm text-slate-600 truncate mt-1">{c.description}</p>
-                <div className="flex items-center gap-3 mt-3 text-slate-600 text-sm">
-                  <span>👥 {c.members}</span>
-                  <div className="flex gap-2 flex-wrap">
-                    {c.tags.slice(0,3).map(t => (
-                      <span key={t} className="text-xs bg-slate-100 px-2 py-1 rounded-full">{t}</span>
-                    ))}
+            {filteredCommunities.length > 0 ? (
+              filteredCommunities.slice(0, 6).map((c) => (
+                <motion.div key={c.id} whileHover={{ scale: 1.02 }} className="bg-white rounded-xl shadow p-4 cursor-pointer" onClick={() => setSelectedCommunity(c)}>
+                  <div className="h-64 w-full overflow-hidden rounded-md mb-3 bg-slate-100">
+                    <img 
+                      src={c.image} 
+                      alt={c.name} 
+                      className="w-full h-64 object-cover" 
+                      style={{ filter: 'none', transform: 'none' }} 
+                    />
                   </div>
-                </div>
-                <div className="mt-4">
-                  <button onClick={(e)=>{e.stopPropagation(); setSelectedCommunity(c)}} className="px-4 py-2 rounded-xl bg-cyan-500 text-white font-semibold">View Details</button>
-                </div>
-              </motion.div>
-            ))}
+                  <h3 className="text-lg font-bold text-slate-900">{c.name}</h3>
+                  <p className="text-sm text-slate-600 truncate mt-1">{c.description}</p>
+                  <div className="flex items-center gap-3 mt-3 text-slate-600 text-sm">
+                    <span>👥 {c.members}</span>
+                    <div className="flex gap-2 flex-wrap">
+                      {c.tags.slice(0,3).map(t => (
+                        <span key={t} className="text-xs bg-slate-100 px-2 py-1 rounded-full">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <button onClick={(e)=>{e.stopPropagation(); setSelectedCommunity(c)}} className="px-4 py-2 rounded-xl bg-cyan-500 text-white font-semibold">View Details</button>
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="text-center text-slate-600 text-lg font-semibold">No such community found</div>
+            )}
           </div>
         </div>
       </div>

@@ -28,32 +28,69 @@ export default function LandingPage({ userName, onNavigate, onCommunityCreated }
 
   function Icon({ children, src }){
     if (src) {
-      return <img src={src} alt="logo" className="w-10 h-10 rounded-lg object-cover shadow-md" />
+      return <img src={src} alt="logo" className="w-20 h-20 rounded-lg object-cover shadow-md" /> // Increased size to 20x20
     }
     return (
-      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center text-white font-bold shadow-md text-base">{children}</div>
+      <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center text-white font-bold shadow-md text-base">{children}</div>
     )
   }
   const cards = [
-    { key: 'events', title: 'Events', img: '/events.jpg', desc: 'Explore upcoming hackathons, mentorship drives, and innovation challenges. Your next big idea might begin at one of these events!' },
-    { key: 'communities', title: 'Communities', img: '/communities.jpg', desc: 'Communities bring together students who share the same passion — whether it’s art, nature, tech, studies, or sports. Join a group that inspires you, collaborate on ideas, and grow with people who dream the same way you do.' },
-    { key: 'discussions', title: 'Discussions', img: '/discussion.webp', desc: 'Engage in meaningful conversations, share your thoughts, and learn from others in the community.' },
-    { key: 'form-teams', title: 'Form Teams', img: '/teams.jpg', desc: 'Build teams that think, create, and innovate together. From brainstorming concepts to completing projects — teamwork turns imagination into achievement.', onClick: () => setShowTeamsModal(true) },
-    { key: 'questions', title: 'Ask Questions', img: '/questions.jpg', desc: 'Don’t just wonder — ask. Share your questions, solve doubts, and contribute your knowledge to help the community grow.' },
-    { key: 'collaborate', title: 'Collaborate', img: '/collaborate.avif', desc: 'Join hands with peers to bring ideas to life. From social work to innovation projects, collaboration turns small efforts into meaningful change.' },
+    {
+      key: 'events',
+      title: 'Events',
+      img: '/events.jpg',
+      desc: 'Explore upcoming hackathons, mentorship drives, and innovation challenges. Your next big idea might begin at one of these events!',
+      onClick: () => onNavigate && onNavigate('events'),
+    },
+    {
+      key: 'communities',
+      title: 'Communities',
+      img: '/communities.jpg',
+      desc: 'Communities bring together students who share the same passion — whether it’s art, nature, tech, studies, or sports. Join a group that inspires you, collaborate on ideas, and grow with people who dream the same way you do.',
+      onClick: () => onNavigate && onNavigate('communities'),
+    },
+    {
+      key: 'discussions',
+      title: 'Discussions',
+      img: '/discussion.webp',
+      desc: 'Engage in meaningful conversations, share your thoughts, and learn from others in the community.',
+      onClick: () => onNavigate && onNavigate('discussions'),
+    },
+    {
+      key: 'form-teams',
+      title: 'Form Teams',
+      img: '/teams.jpg',
+      desc: 'Build teams that think, create, and innovate together. From brainstorming concepts to completing projects — teamwork turns imagination into achievement.',
+      onClick: () => setShowTeamsModal(true),
+    },
   ]
 
+  const handleSearch = (query) => {
+    const lowerCaseQuery = query.toLowerCase();
+    if (lowerCaseQuery.includes('events')) {
+      onNavigate && onNavigate('events');
+    } else if (lowerCaseQuery.includes('communities')) {
+      onNavigate && onNavigate('communities');
+    } else if (lowerCaseQuery.includes('discussions')) {
+      onNavigate && onNavigate('discussions');
+    } else if (lowerCaseQuery.includes('teams')) {
+      onNavigate && onNavigate('form-teams');
+    } else {
+      alert('No matching page found. Please search for Events, Communities, Discussions, or Teams.');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50">
-  <header ref={headerRef} className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
-            <div className="max-w-full px-6 py-5 md:py-6 flex items-center justify-between">
+    <div className="min-h-screen" style={{ backgroundColor: '#ECE4D7' }}>
+      <header ref={headerRef} className="sticky top-0 z-40" style={{ backgroundColor: '#EBE2DB' }}> {/* Header with minimal padding */}
+        <div className="max-w-full px-6 py-1 md:py-2 flex items-center justify-between border-b-4 border-black backdrop-blur"> {/* Minimal padding to decrease space further */}
           {/* Left: Logo and Name */}
           <div className="flex items-center gap-2">
             <button 
               onClick={() => onNavigate && onNavigate('landing')}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
-              <Icon src="/logo.png">CC</Icon>
+              <Icon src="/images/logo.png" />
               <span className="font-extrabold text-3xl md:text-4xl text-slate-900">CampusConnect</span>
             </button>
           </div>
@@ -98,14 +135,44 @@ export default function LandingPage({ userName, onNavigate, onCommunityCreated }
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-10 md:pl-80">
-        <div className="flex gap-6">
+      {/* Removed the motivational text section */}
+
+      {/* Adjusted the search bar to be perfectly centered on the page. */}
+      <div className="flex flex-col justify-center items-center h-3/4"> {/* Adjusted layout for text and image */}
+        <div className="flex justify-between items-center h-3/4 px-16 mt-10"> {/* Adjusted padding to move text further to the right */}
+          <div className="text-left w-1/2 md:pl-[30%]"> {/* Increased padding-left to shift text */}
+            <h2 className="text-6xl font-extrabold text-slate-800">Discover. Connect. Innovate.</h2> {/* Single line for the main text */}
+            <p className="text-2xl font-bold text-slate-600">From idea to impact — together. Think. Build. Belong.</p> {/* Subtext remains the same */}
+          </div>
+          <div className="flex justify-end w-[70%]"> {/* Adjusted the width of the container */}
+            <div className="w-[600px] h-[350px] bg-gray-200 rounded-2xl"> {/* Increased the size of the image */}
+              <img src="/images/clg.jpg" alt="College" className="w-full h-full object-cover rounded-2xl" />
+            </div>
+          </div>
+        </div>
+        <div className="relative max-w-5xl w-full mx-auto mt-10 flex justify-center"> {/* Centered the search bar */}
+          <input 
+            type="text" 
+            className="w-full rounded-3xl bg-white shadow-xl ring-1 ring-slate-200 pl-16 pr-6 py-6 text-xl focus:outline-none focus:ring-2 focus:ring-primary" 
+            placeholder="Search..." 
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch(e.target.value);
+              }
+            }}
+          />
+          <span className="absolute left-6 top-1/2 -translate-y-1/2 text-3xl text-slate-400">🔍</span>
+        </div>
+      </div>
+
+      <main className="max-w-full mx-auto px-6 py-10 md:pl-80">
+        <div className="flex gap-4">
           {/* Left Sidebar - fixed to extreme left on md+ */}
           <aside
             className="hidden md:block fixed left-0 w-80"
-            style={{ top: `${headerHeight}px`, height: `calc(100vh - ${headerHeight}px)` }}
+            style={{ top: `${headerHeight}px`, height: `calc(100vh - ${headerHeight}px)`, backgroundColor: '#F8F3EA' }}
           >
-            <div className="bg-white shadow-lg p-4 h-full overflow-auto">
+            <div className="shadow-lg p-4 h-full overflow-auto">
               <nav className="space-y-2">
                 <button 
                   onClick={() => setShowCreateModal(true)}
@@ -154,23 +221,27 @@ export default function LandingPage({ userName, onNavigate, onCommunityCreated }
             </div>
 
             {/* Cards Section - Discover and Join */}
-<section className="px-6 pb-16">
-  <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {cards.map((card) => (
-      <div
-        key={card.key}
-        className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow cursor-pointer relative"
-        onClick={card.onClick}
-      >
-        <img src={card.img} alt={card.title} className="w-full h-48 object-cover" />
-        <div className="p-6">
-          <h3 className="text-xl font-bold text-slate-800 mb-2 text-center">{card.title}</h3>
-          <p className="text-sm text-slate-600 text-center">{card.desc}</p>
+            <section className="px-6 pb-16 mt-10"> {/* Kept margin-top same */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {cards.map((card) => (
+                  <div
+                    key={card.key}
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow cursor-pointer relative"
+                    onClick={card.onClick}
+                    style={{ height: '450px' }}
+                  >
+                    <img src={card.img} alt={card.title} className="w-full h-60 object-cover" />
+                    <div className="p-6 flex flex-col justify-between h-full">
+          <div>
+            <h3 className="text-xl font-bold text-slate-800 mb-2">{card.title}</h3>
+            <p className="text-sm text-slate-600">{card.desc}</p>
+          </div>
+          <div className="mt-8"></div>
         </div>
-      </div>
-    ))}
-  </div>
-</section>
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
         </div>
       </main>

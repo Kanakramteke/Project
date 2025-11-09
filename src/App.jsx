@@ -309,29 +309,29 @@ function Icon({ children, src }){
   // show it; otherwise fall back to the stylized initials placeholder.
   if (src) {
     return (
-      <img src={src} alt="logo" className="w-12 h-12 md:w-14 md:h-14 rounded-lg object-cover shadow-md" />
+      <img src={src} alt="logo" className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover shadow-md" />
     )
   }
 
   return (
-    <div className="w-12 h-12 md:w-14 md:h-14 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold shadow-md text-lg md:text-xl">{children}</div>
+    <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold shadow-md text-lg md:text-xl">{children}</div>
   )
 }
 
 function Header({ theme, toggleTheme, onLoginClick }){
   return (
     <header className="bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm sticky top-0 z-30 shadow-sm">
-      <div className="max-w-6xl mx-auto px-6 py-5 md:py-6 flex items-center justify-between gap-4">
+      <div className="max-w-6xl mx-auto px-6 py-1.5 md:py-2 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           {/* Logo area: drop /logo.png into the public folder to replace the placeholder */}
-          <Icon src="/logo.png">CC</Icon>
+          <Icon src="/images/logo.png">CC</Icon>
 
           <div>
-            <div className="font-extrabold text-xl md:text-2xl text-slate-900 dark:text-white">CampusConnect</div>
+            <div className="font-black text-2xl md:text-4xl text-slate-900 dark:text-white">CampusConnect</div>
           </div>
         </div>
         
-        <button onClick={onLoginClick} className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-base md:text-lg px-5 md:px-6 py-2.5 md:py-3 rounded-lg shadow-lg hover:shadow-xl transition-all">
+        <button onClick={onLoginClick} className="inline-flex items-center gap-2 bg-black hover:bg-primary/90 text-white font-bold text-sm md:text-base px-4 md:px-5 py-1.5 md:py-2 rounded-lg shadow-lg hover:shadow-xl transition-all">
           Login
         </button>
       </div>
@@ -366,7 +366,13 @@ function Hero({ onSignUpClick }){
             </p>
           </motion.div>
           <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay: 0.9 }} className="mt-8 flex gap-4">
-            <button onClick={onSignUpClick} className="inline-flex items-center gap-2 bg-primary hover:bg-cyan-500 text-white font-bold text-lg md:text-xl px-6 md:px-8 py-3.5 md:py-4 rounded-lg shadow-lg hover:shadow-xl transition-all">Get Started</button>
+            <motion.button 
+              whileTap={{ scale: 0.95 }} 
+              onClick={onSignUpClick} 
+              className="inline-flex items-center gap-2 bg-black text-white font-bold text-md md:text-lg px-4 md:px-6 py-2.5 md:py-3 rounded-lg shadow-lg transition-all"
+            >
+              Get Started
+            </motion.button>
           </motion.div>
         </div>
 
@@ -378,7 +384,7 @@ function Hero({ onSignUpClick }){
               </div>
             </div>
 
-            <div className="mt-6 bg-gradient-to-br from-primary/20 via-accent/20 to-primary/10 dark:from-primary/30 dark:via-accent/30 dark:to-primary/20 rounded-xl p-8 backdrop-blur-sm">
+            <div className="mt-6 bg-[#F4DBCC] border-2 border-black rounded-xl p-8 backdrop-blur-sm">
               <div className="text-slate-900 dark:text-white font-bold text-2xl md:text-3xl mb-6">Step inside a space built just for students.</div>
               <div className="mt-2 text-slate-800 dark:text-slate-100 text-lg md:text-xl leading-relaxed">
                 Explore college fests happening around Nagpur, share ideas that inspire, and be part of communities that match your vibe.
@@ -424,20 +430,21 @@ function Features(){
 
       <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
         {items.map((it, i) => (
-            <motion.div 
-              key={it.title} 
-              initial={{ y: 30, opacity: 0 }} 
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.5, delay: i * 0.15 }}
-              whileHover={{ 
-                y: -5,
-                scale: 1.02,
-                transition: { duration: 0.2 }
-              }}
-              className="group p-6 bg-slate-50 dark:bg-slate-800 rounded-xl shadow-md ring-1 ring-slate-200 dark:ring-slate-700 transition-shadow duration-300 hover:shadow-xl"
-            >
-              <div className="text-lg font-semibold text-slate-900 dark:text-white transition-colors duration-300 group-hover:text-primary">{it.title}</div>
+          <motion.div 
+            key={it.title} 
+            initial={{ y: 30, opacity: 0 }} 
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.5, delay: i * 0.15 }}
+            whileHover={{ 
+              y: -5,
+              scale: 1.02,
+              transition: { duration: 0.2 }
+            }}
+            whileTap={{ scale: 0.95 }}
+            className="group p-6 bg-slate-50 dark:bg-slate-800 rounded-xl shadow-md ring-1 ring-slate-200 dark:ring-slate-700 transition-shadow duration-300 hover:shadow-xl"
+          >
+            <div className="text-lg font-bold text-slate-900 dark:text-white transition-colors duration-300 group-hover:text-primary">{it.title}</div>
             {(it.title === 'Personalized Space' || it.title === 'Join Communities' || it.title === 'Campus Calendar') && (
               <img 
                 src={
@@ -446,7 +453,7 @@ function Features(){
                   : '/img3.jpg'
                 } 
                 alt={`${it.title} Feature`} 
-                  className="w-full h-40 object-cover rounded-lg my-4 transition-transform duration-300 group-hover:scale-[1.02]"
+                className="w-full h-40 object-cover rounded-lg my-4 transition-transform duration-300 group-hover:scale-[1.02]"
               />
             )}
             <div className="mt-2 text-slate-600 dark:text-slate-300">{it.body}</div>
@@ -465,13 +472,20 @@ function Contact(){
         whileInView={{ y: 0, opacity: 1 }} 
         viewport={{ once: false, amount: 0.3 }}
         transition={{ duration: 0.6 }} 
-        className="bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-900 dark:to-slate-900 p-8 rounded-xl shadow-lg"
+        className="bg-black p-8 rounded-xl shadow-lg"
       >
-        <h3 className="text-xl font-semibold text-slate-900 dark:text-white">Get in touch</h3>
-        <p className="mt-2 text-slate-600 dark:text-slate-300">Want help building this out? Drop a line.</p>
-        <div className="mt-4">
-          <a href="mailto:hello@example.com" className="inline-block px-4 py-2 bg-primary text-white rounded-lg">hello@example.com</a>
-        </div>
+        <h3 className="text-xl font-semibold text-white mb-4">Get in touch</h3>
+        <ul className="flex items-center gap-4">
+          <li>
+            <img src="/images/instagram.jpg" alt="Instagram" className="w-10 h-10" />
+          </li>
+          <li>
+            <img src="/images/linkedin.png" alt="LinkedIn" className="w-10 h-10" />
+          </li>
+          <li>
+            <img src="/images/X.avif" alt="X" className="w-10 h-10" />
+          </li>
+        </ul>
       </motion.div>
     </section>
   )
@@ -522,7 +536,7 @@ export default function App(){
   }
 
   return (
-    <div className={isAuthed ? "min-h-screen bg-gradient-to-br from-[#F9FAFB] to-[#E3F2FD]" : "min-h-screen bg-gradient-to-br from-slate-50 via-white to-primary/5 dark:from-slate-950 dark:via-slate-900 dark:to-primary/10"}>
+    <div className="min-h-screen bg-[#E6C8B9]">
       {isAuthed ? (
         <>
           {currentPage === 'landing' && <LandingPage userName={userName} onNavigate={setCurrentPage} onCommunityCreated={handleCommunityCreatedApp} />}
