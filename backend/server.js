@@ -24,13 +24,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Debug middleware with more detailed logging
+// Debug middleware
 app.use((req, res, next) => {
-    console.log('📝 Request Details:');
-    console.log('  URL:', req.url);
-    console.log('  Method:', req.method);
-    console.log('  Body:', req.body);
-    console.log('  Headers:', req.headers);
+    console.log(`📝 ${req.method} ${req.url}`);
+    if (req.body && Object.keys(req.body).length) {
+        console.log('Request Body:', req.body);
+    }
     next();
 });
 
@@ -38,51 +37,80 @@ app.use((req, res, next) => {
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes);
 
-// MongoDB connection with retry logic
+// MongoDB connection
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
+        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/campusconnect');
         console.log('✅ Connected to MongoDB');
     } catch (err) {
         console.error('❌ MongoDB connection error:', err.message);
-        // Retry connection after 5 seconds
+        console.log('⏳ Retrying connection in 5 seconds...');
         setTimeout(connectDB, 5000);
     }
 };
 
-connectDB();
-
-// Test route with health check
+// Health check route
 app.get('/', (req, res) => {
     res.json({
         success: true,
-        message: '🚀 Campus Connect backend is running successfully!',
-        timestamp: new Date(),
-        environment: process.env.NODE_ENV
+        message: '🚀 Campus Connect API is running',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
     });
 });
 
 // Error handling middleware
 app.use(errorHandler);
 
-// Start server with enhanced logging
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-    console.log(`
+// Server startup with enhanced port retry logic
+const startServer = async (port) => {
+    return new Promise((resolve, reject) => {
+        const server = app.listen(port)
+            .once('listening', () => {
+                console.log(`
 ✅ Server Status:
-   - Running on: http://localhost:${PORT}
+   - Running on: http://localhost:${port}
    - Environment: ${process.env.NODE_ENV || 'development'}
    - Timestamp: ${new Date().toISOString()}
-    `);
-});
+                `);
+                resolve(server);
+            })
+            .once('error', err => {
+                if (err.code === 'EADDRINUSE') {
+                    console.log(`⚠️ Port ${port} is busy, trying ${port + 1}`);
+                    resolve(startServer(port + 1));
+                } else {
+                    reject(err);
+                }
+            });
 
-// Handle server shutdown
-process.on('SIGTERM', () => {
-    console.log('🛑 Received SIGTERM. Performing graceful shutdown...');
-    server.close(() => {
-        mongoose.connection.close(false, () => {
-            console.log('💤 Server and MongoDB connection closed');
-            process.exit(0);
+        // Graceful shutdown handler
+        process.on('SIGTERM', () => {
+            console.log('🛑 Received SIGTERM. Performing graceful shutdown...');
+            server.close(() => {
+                mongoose.connection.close(false, () => {
+                    console.log('💤 Server and MongoDB connection closed');
+                    process.exit(0);
+                });
+            });
         });
     });
-});
+};
+
+// Initialize server
+const PORT = process.env.PORT || 5000;
+
+// Start application with improved error handling
+connectDB()
+    .then(async () => {
+        try {
+            await startServer(PORT);
+        } catch (err) {
+            console.error('❌ Failed to start server:', err);
+            process.exit(1);
+        }
+    })
+    .catch(err => {
+        console.error('❌ Failed to connect to database:', err);
+        process.exit(1);
+    });
