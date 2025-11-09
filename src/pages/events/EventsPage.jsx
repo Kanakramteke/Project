@@ -4,11 +4,11 @@ import CreateModal from '../create/CreateModal'
 
 function Icon({ children, src }){
   if (src) {
-    return <img src={src} alt="logo" className="w-10 h-10 rounded-lg object-cover shadow-md" />
+    return <img src={src} alt="logo" className="w-20 h-20 rounded-lg object-cover shadow-md" />; // Increased size to 20x20
   }
   return (
-    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center text-white font-bold shadow-md text-base">{children}</div>
-  )
+    <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-sky-500 to-sky-600 flex items-center justify-center text-white font-bold shadow-md text-base">{children}</div>
+  );
 }
 
 const technicalEvents = [
@@ -372,16 +372,14 @@ export default function EventsPage({ userName, onNavigate }) {
     { id: 'events', label: 'Events', onClick: () => onNavigate && onNavigate('events') },
     { id: 'communities', label: 'Communities', onClick: () => onNavigate && onNavigate('communities') },
     { id: 'discussions', label: 'Discussions', onClick: () => onNavigate && onNavigate('discussions') },
-    { id: 'teams', label: 'Form Teams', onClick: () => onNavigate && onNavigate('teams') },
-    { id: 'questions', label: 'Ask Questions', onClick: () => onNavigate && onNavigate('questions') },
-    { id: 'collaborate', label: 'Collaborate', onClick: () => onNavigate && onNavigate('collaborate') },
+    { id: 'teams', label: 'Form Teams', onClick: () => onNavigate && onNavigate('teams') }
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: '#ECE4D7' }}> {/* Added background color */}
       {/* Top Navigation */}
-      <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
-        <div className="max-w-full px-6 py-5 md:py-6 flex items-center justify-between">
+      <nav className="sticky top-0 z-40" style={{ backgroundColor: '#EBE2DB' }}> {/* Updated header background color */}
+        <div className="max-w-full px-6 py-5 md:py-6 flex items-center justify-between border-b-4 border-black backdrop-blur"> {/* Added black border at the bottom */}
           {/* Left: Logo and Name */}
           <div className="flex items-center gap-2">
             <button 
@@ -395,7 +393,7 @@ export default function EventsPage({ userName, onNavigate }) {
               onClick={() => onNavigate && onNavigate('landing')}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
-              <Icon src="/logo.png">CC</Icon>
+              <Icon src="/images/logo.png" />
               <span className="font-extrabold text-2xl md:text-3xl text-slate-900">CampusConnect</span>
             </button>
           </div>
@@ -440,8 +438,8 @@ export default function EventsPage({ userName, onNavigate }) {
       {/* Main Content with Sidebar and Cards */}
       <div className="flex gap-6">
         {/* Left Sidebar Panel - Full Length */}
-        <aside className="w-80 flex-shrink-0">
-          <div className="bg-white shadow-lg p-4 min-h-screen">
+        <aside className="w-80 flex-shrink-0" style={{ backgroundColor: '#F8F3EA' }}> {/* Updated sidebar background color */}
+          <div className="shadow-lg p-4 min-h-screen"> {/* Removed redundant background color */}
             <nav className="space-y-2">
               <button 
                 onClick={() => setShowCreateModal(true)}

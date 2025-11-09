@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 export default function TeamsPage() {
   const [joinFormOpen, setJoinFormOpen] = useState(false);
-  const [createTeamFormOpen, setCreateTeamFormOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState(null);
 
   const [teams, setTeams] = useState([
@@ -69,26 +68,6 @@ export default function TeamsPage() {
     setJoinFormOpen(false);
   };
 
-  const handleCreateTeamSubmit = (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const newTeam = {
-      id: teams.length + 1,
-      name: formData.get('teamName'),
-      purpose: formData.get('teamPurpose'),
-      work: formData.get('teamWork'),
-      skills: formData.get('teamSkills'),
-      requiredMembers: parseInt(formData.get('teamRequiredMembers'), 10),
-      totalCapacity: parseInt(formData.get('teamTotalCapacity'), 10),
-      collegeName: formData.get('teamCollegeName'),
-      headName: formData.get('teamHeadName'),
-      email: formData.get('teamEmail'),
-      contact: formData.get('teamContact'),
-    };
-    setTeams((prevTeams) => [...prevTeams, newTeam]);
-    setCreateTeamFormOpen(false);
-  };
-
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
@@ -101,17 +80,11 @@ export default function TeamsPage() {
               className="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-lg font-semibold shadow-sm"
             />
           </div>
-          <button
-            onClick={() => setCreateTeamFormOpen(true)}
-            className="px-6 py-3 bg-cyan-500 text-white font-bold rounded-lg shadow-md hover:bg-cyan-600 transition-all"
-          >
-            Create Team
-          </button>
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-10">
-        <div className="space-y-6 max-h-[80vh] overflow-y-auto">
+        <div className="space-y-6 max-h-[90vh] overflow-y-auto">
           {teams.map((team) => (
             <div
               key={team.id}
@@ -152,150 +125,6 @@ export default function TeamsPage() {
           ))}
         </div>
       </main>
-
-      {createTeamFormOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-bold text-slate-800">Create a New Team</h2>
-              <button
-                onClick={() => setCreateTeamFormOpen(false)}
-                className="text-slate-500 hover:text-slate-700 text-2xl"
-              >
-                ✕
-              </button>
-            </div>
-            <form onSubmit={handleCreateTeamSubmit} className="space-y-6">
-              <div>
-                <label className="block text-slate-700 font-bold mb-2" htmlFor="teamName">
-                  Team Name
-                </label>
-                <input
-                  type="text"
-                  id="teamName"
-                  name="teamName"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-lg"
-                  placeholder="Enter team name"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-700 font-bold mb-2" htmlFor="teamPurpose">
-                  Team Purpose
-                </label>
-                <textarea
-                  id="teamPurpose"
-                  name="teamPurpose"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-lg"
-                  placeholder="Describe the purpose of the team"
-                ></textarea>
-              </div>
-              <div>
-                <label className="block text-slate-700 font-bold mb-2" htmlFor="teamWork">
-                  Working On
-                </label>
-                <textarea
-                  id="teamWork"
-                  name="teamWork"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-lg"
-                  placeholder="What is the team working on?"
-                ></textarea>
-              </div>
-              <div>
-                <label className="block text-slate-700 font-bold mb-2" htmlFor="teamSkills">
-                  Skills Required
-                </label>
-                <input
-                  type="text"
-                  id="teamSkills"
-                  name="teamSkills"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-lg"
-                  placeholder="Enter required skills"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-700 font-bold mb-2" htmlFor="teamRequiredMembers">
-                  Required Members
-                </label>
-                <input
-                  type="number"
-                  id="teamRequiredMembers"
-                  name="teamRequiredMembers"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-lg"
-                  placeholder="Enter number of required members"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-700 font-bold mb-2" htmlFor="teamTotalCapacity">
-                  Total Capacity
-                </label>
-                <input
-                  type="number"
-                  id="teamTotalCapacity"
-                  name="teamTotalCapacity"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-lg"
-                  placeholder="Enter total capacity of the team"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-700 font-bold mb-2" htmlFor="teamCollegeName">
-                  College Name
-                </label>
-                <input
-                  type="text"
-                  id="teamCollegeName"
-                  name="teamCollegeName"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-lg"
-                  placeholder="Enter college name"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-700 font-bold mb-2" htmlFor="teamHeadName">
-                  Head Name
-                </label>
-                <input
-                  type="text"
-                  id="teamHeadName"
-                  name="teamHeadName"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-lg"
-                  placeholder="Enter head name"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-700 font-bold mb-2" htmlFor="teamEmail">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="teamEmail"
-                  name="teamEmail"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-lg"
-                  placeholder="Enter email"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-700 font-bold mb-2" htmlFor="teamContact">
-                  Contact Number
-                </label>
-                <input
-                  type="text"
-                  id="teamContact"
-                  name="teamContact"
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-lg"
-                  placeholder="Enter contact number"
-                />
-              </div>
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  className="px-6 py-3 bg-cyan-500 text-white font-bold rounded-lg shadow-md hover:bg-cyan-600 transition-all text-lg"
-                >
-                  Submit
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {joinFormOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
