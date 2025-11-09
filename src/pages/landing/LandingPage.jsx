@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import CreateModal from '../create/CreateModal'
 import TeamsPage from '../teams/TeamsPage'
+import ProfilePage from '../profile/ProfilePage';
+import CalendarPage from '../calendar/CalendarPage';
 
-export default function LandingPage({ userName, onNavigate, onCommunityCreated }){
+export default function LandingPage({ onNavigate, onCommunityCreated }){
   const [menuOpen, setMenuOpen] = useState(false)
   const headerRef = useRef(null)
   const [headerHeight, setHeaderHeight] = useState(64)
@@ -18,12 +20,16 @@ export default function LandingPage({ userName, onNavigate, onCommunityCreated }
   }, [])
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showTeamsModal, setShowTeamsModal] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
+  const [userName, setUserName] = useState('');
 
   const quickNav = [
     { id: 'events', label: 'Events', onClick: () => onNavigate && onNavigate('events') },
     { id: 'communities', label: 'Communities', onClick: () => onNavigate && onNavigate('communities') },
     { id: 'discussions', label: 'Discussions', onClick: () => onNavigate && onNavigate('discussions') },
     { id: 'form-teams', label: 'Form Teams', onClick: () => setShowTeamsModal(true) },
+   
   ]
 
   function Icon({ children, src }){
@@ -80,6 +86,10 @@ export default function LandingPage({ userName, onNavigate, onCommunityCreated }
     }
   };
 
+  function handleSaveDetails(name) {
+    setUserName(name);
+  }
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#ECE4D7' }}>
       <header ref={headerRef} className="sticky top-0 z-40" style={{ backgroundColor: '#EBE2DB' }}> {/* Header with minimal padding */}
@@ -124,8 +134,7 @@ export default function LandingPage({ userName, onNavigate, onCommunityCreated }
               <AnimatePresence>
                 {menuOpen && (
                   <motion.div initial={{opacity:0, y:8}} animate={{opacity:1, y:0}} exit={{opacity:0, y:8}} className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow ring-1 ring-slate-200 p-2">
-                    <a className="block px-3 py-2 rounded-lg hover:bg-slate-50">My Profile</a>
-                    <a className="block px-3 py-2 rounded-lg hover:bg-slate-50">Settings</a>
+                    <a onClick={() => { setShowProfileModal(true); setMenuOpen(false); }} className="block px-3 py-2 rounded-lg hover:bg-slate-50">My Profile</a>
                     <a className="block px-3 py-2 rounded-lg hover:bg-slate-50">Logout</a>
                   </motion.div>
                 )}
@@ -279,6 +288,31 @@ export default function LandingPage({ userName, onNavigate, onCommunityCreated }
               onClick={(e) => e.stopPropagation()}
             >
               <TeamsPage />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Profile Modal */}
+      <AnimatePresence>
+        {showProfileModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center px-4"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowProfileModal(false);
+            }}
+          >
+            <motion.div
+              initial={{ y: 40, opacity: 0, scale: 0.98 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 20, opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+              className="w-full max-w-2xl max-h-[500px] rounded-xl bg-white dark:bg-slate-900 shadow-2xl ring-1 ring-slate-200 dark:ring-slate-700 p-6 overflow-auto"
+            >
+              <ProfilePage onNameChange={handleSaveDetails} />
             </motion.div>
           </motion.div>
         )}

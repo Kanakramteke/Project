@@ -193,7 +193,6 @@ export default function CommunitiesPage({ userName, onNavigate, createdCommuniti
                 {menuOpen && (
                   <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow ring-1 ring-slate-200 p-2">
                     <a className="block px-3 py-2 rounded-lg hover:bg-slate-50">My Profile</a>
-                    <a className="block px-3 py-2 rounded-lg hover:bg-slate-50">Settings</a>
                     <a className="block px-3 py-2 rounded-lg hover:bg-slate-50">Logout</a>
                   </motion.div>
                 )}
@@ -266,7 +265,15 @@ export default function CommunitiesPage({ userName, onNavigate, createdCommuniti
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCommunities.length > 0 ? (
               filteredCommunities.slice(0, 6).map((c) => (
-                <motion.div key={c.id} whileHover={{ scale: 1.02 }} className="bg-white rounded-xl shadow p-4 cursor-pointer" onClick={() => setSelectedCommunity(c)}>
+                <motion.div 
+                  key={c.id} 
+                  initial={{ opacity: 0, y: 20 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  exit={{ opacity: 0, y: 20 }}
+                  whileHover={{ scale: 1.02 }}
+                  className="bg-white rounded-xl shadow p-4 cursor-pointer"
+                  onClick={() => setSelectedCommunity(c)}
+                >
                   <div className="h-64 w-full overflow-hidden rounded-md mb-3 bg-slate-100">
                     <img 
                       src={c.image} 
@@ -346,7 +353,6 @@ export default function CommunitiesPage({ userName, onNavigate, createdCommuniti
                 <div className="flex gap-3">
                   <button onClick={() => handleJoin(selectedCommunity)} className="flex-1 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-cyan-500 to-purple-500">Join Community</button>
                   <button onClick={()=>alert('Following updates — you\'ll receive notifications.')} className="px-5 py-3 rounded-lg font-bold text-slate-700 bg-slate-100">Follow Updates</button>
-                  <button onClick={()=>{ setRequestSent(prev=>({ ...prev, [selectedCommunity.id]: true })); alert('Your request has been sent. You’ll be notified once approved.') }} className="px-5 py-3 rounded-lg font-bold text-slate-700 bg-slate-100">Request to Join</button>
                 </div>
               </div>
             </motion.div>

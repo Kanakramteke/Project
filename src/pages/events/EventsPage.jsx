@@ -379,7 +379,7 @@ export default function EventsPage({ userName, onNavigate }) {
     <div className="min-h-screen" style={{ backgroundColor: '#ECE4D7' }}> {/* Added background color */}
       {/* Top Navigation */}
       <nav className="sticky top-0 z-40" style={{ backgroundColor: '#EBE2DB' }}> {/* Updated header background color */}
-        <div className="max-w-full px-6 py-5 md:py-6 flex items-center justify-between border-b-4 border-black backdrop-blur"> {/* Added black border at the bottom */}
+        <div className="max-w-full px-6 py-3 md:py-4 flex items-center justify-between border-b-4 border-black backdrop-blur"> {/* Reduced padding for smaller header */}
           {/* Left: Logo and Name */}
           <div className="flex items-center gap-2">
             <button 
@@ -425,7 +425,7 @@ export default function EventsPage({ userName, onNavigate }) {
                 {menuOpen && (
                   <motion.div initial={{opacity:0, y:8}} animate={{opacity:1, y:0}} exit={{opacity:0, y:8}} className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow ring-1 ring-slate-200 p-2">
                     <a className="block px-3 py-2 rounded-lg hover:bg-slate-50">My Profile</a>
-                    <a className="block px-3 py-2 rounded-lg hover:bg-slate-50">Settings</a>
+
                     <a className="block px-3 py-2 rounded-lg hover:bg-slate-50">Logout</a>
                   </motion.div>
                 )}
