@@ -4,9 +4,26 @@ import EventsPage from './pages/events/EventsPage'
 import CommunitiesPage from './pages/communities/CommunitiesPage'
 import LandingPage from './pages/landing/LandingPage'
 import DiscussionsPage from './pages/discussions/DiscussionsPage'
+import axios from 'axios' // Add this import
 
 function LoginModal({ open, onClose, onSuccess }){
   if (!open) return null
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const email = e.target.email.value
+    const password = e.target.password.value
+
+    try {
+      const res = await axios.post('http://localhost:5000/api/users/login', { email, password })
+      localStorage.setItem('token', res.data.token)
+      localStorage.setItem('userName', res.data.user.name || email.split('@')[0])
+      onSuccess()
+      onClose()
+    } catch (err) {
+      alert(err.response?.data?.message || 'Login failed')
+    }
+  }
 
   return (
     <AnimatePresence>
@@ -39,7 +56,7 @@ function LoginModal({ open, onClose, onSuccess }){
             </button>
           </div>
 
-          <form className="mt-6 space-y-5" onSubmit={(e)=>{e.preventDefault(); onSuccess && onSuccess(); onClose && onClose();}}>
+          <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-base md:text-lg font-medium text-slate-700 dark:text-slate-300">Email</label>
               <input
@@ -105,9 +122,9 @@ function LoginModal({ open, onClose, onSuccess }){
 function SignUpModal({ open, onClose, onSuccess }){
   if (!open) return null
 
-  const [contactError, setContactError] = React.useState('')
-  const [passwordError, setPasswordError] = React.useState('')
-  const [confirmPasswordError, setConfirmPasswordError] = React.useState('')
+  const [contactError, setContactError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [confirmPasswordError, setConfirmPasswordError] = useState('')
 
   const validateContact = (value) => {
     if (!/^[0-9]{10}$/.test(value)) {
@@ -142,21 +159,35 @@ function SignUpModal({ open, onClose, onSuccess }){
     return true
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const formData = new FormData(e.target)
     const contact = formData.get('contact')
     const password = formData.get('password')
     const confirmPassword = formData.get('confirmPassword')
-    const username = formData.get('username')
+    const name = formData.get('username')
+    const email = formData.get('email')
 
     const isContactValid = validateContact(contact)
     const isPasswordValid = validatePassword(password)
     const isConfirmValid = validateConfirmPassword(password, confirmPassword)
 
     if (isContactValid && isPasswordValid && isConfirmValid) {
-      onSuccess && onSuccess({ name: username })
-      onClose && onClose()
+      try {
+        const res = await axios.post('http://localhost:5000/api/users/register', {
+          name,
+          email,
+          number: contact,
+          password,
+          cpassword: confirmPassword
+        })
+        localStorage.setItem('token', res.data.token)
+        localStorage.setItem('userName', name)
+        onSuccess({ name })
+        onClose()
+      } catch (err) {
+        alert(err.response?.data?.message || 'Signup failed')
+      }
     }
   }
 
@@ -205,9 +236,10 @@ function SignUpModal({ open, onClose, onSuccess }){
               />
             </div>
             <div>
-              <label htmlFor="signup-email" className="block text-base md:text-lg font-medium text-slate-700 dark:text-slate-300">Email ID</label>
+              <label htmlFor="email" className="block text-base md:text-lg font-medium text-slate-700 dark:text-slate-300">Email ID</label>
               <input
-                id="signup-email"
+                id="email"
+                name="email"
                 type="email"
                 required
                 className="mt-1 w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 py-3.5 text-lg focus:outline-none focus:ring-2 focus:ring-primary"
@@ -318,7 +350,7 @@ function Icon({ children, src }){
   )
 }
 
-function Header({ theme, toggleTheme, onLoginClick }){
+function Header({ theme, toggleTheme, onLoginClick, onLogout, isAuthed, userName }){
   return (
     <header className="bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm sticky top-0 z-30 shadow-sm">
       <div className="max-w-6xl mx-auto px-6 py-1.5 md:py-2 flex items-center justify-between gap-4">
@@ -331,9 +363,18 @@ function Header({ theme, toggleTheme, onLoginClick }){
           </div>
         </div>
         
-        <button onClick={onLoginClick} className="inline-flex items-center gap-2 bg-black hover:bg-primary/90 text-white font-bold text-sm md:text-base px-4 md:px-5 py-1.5 md:py-2 rounded-lg shadow-lg hover:shadow-xl transition-all">
-          Login
-        </button>
+        {isAuthed ? (
+          <div className="flex items-center gap-4">
+            <span>Welcome, {userName}</span>
+            <button onClick={onLogout} className="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold text-sm md:text-base px-4 md:px-5 py-1.5 md:py-2 rounded-lg shadow-lg hover:shadow-xl transition-all">
+              Logout
+            </button>
+          </div>
+        ) : (
+          <button onClick={onLoginClick} className="inline-flex items-center gap-2 bg-black hover:bg-primary/90 text-white font-bold text-sm md:text-base px-4 md:px-5 py-1.5 md:py-2 rounded-lg shadow-lg hover:shadow-xl transition-all">
+            Login
+          </button>
+        )}
       </div>
     </header>
   )
@@ -496,16 +537,13 @@ export default function App(){
   const [loginOpen, setLoginOpen] = useState(false)
   const [signUpOpen, setSignUpOpen] = useState(false)
   const [isAuthed, setIsAuthed] = useState(false)
-  const [userName, setUserName] = useState('Kanak')
-  const [currentPage, setCurrentPage] = useState('events')
+  const [userName, setUserName] = useState('')
+  const [currentPage, setCurrentPage] = useState('landing')
   const [createdCommunities, setCreatedCommunities] = useState([])
 
   const handleCommunityCreatedApp = (newCommunity) => {
     setCreatedCommunities(prev => [newCommunity, ...prev])
-    // navigate to communities view so user sees it
     setCurrentPage('communities')
-    // optional notification
-    // alert('Community created — it appears in Explore Communities')
   }
 
   useEffect(() => {
@@ -519,24 +557,41 @@ export default function App(){
     setTheme(prev => prev === 'dark' ? 'light' : 'dark')
   }
 
-  const handleLoginSuccess = (email) => {
-    if (email && typeof email === 'string') {
-      const base = email.split('@')[0] || 'User'
-      const pretty = base.charAt(0).toUpperCase() + base.slice(1)
-      setUserName(pretty)
-    }
+  const handleLoginSuccess = () => {
+    setUserName(localStorage.getItem('userName') || 'User')
     setIsAuthed(true)
   }
 
   const handleSignUpSuccess = ({ name }) => {
-    if (name) setUserName(name)
+    setUserName(name)
     setIsAuthed(true)
-    // show the landing page after successful sign up
     setCurrentPage('landing')
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('userName')
+    setIsAuthed(false)
+    setUserName('')
+  }
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      setIsAuthed(true)
+      setUserName(localStorage.getItem('userName') || 'User')
+    }
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#E6C8B9]">
+      <Header 
+        theme={theme} 
+        toggleTheme={toggleTheme} 
+        onLoginClick={() => setLoginOpen(true)} 
+        onLogout={handleLogout}
+        isAuthed={isAuthed}
+        userName={userName}
+      />
       {isAuthed ? (
         <>
           {currentPage === 'landing' && <LandingPage userName={userName} onNavigate={setCurrentPage} onCommunityCreated={handleCommunityCreatedApp} />}
@@ -546,8 +601,7 @@ export default function App(){
         </>
       ) : (
         <>
-          <Header theme={theme} toggleTheme={toggleTheme} onLoginClick={() => setLoginOpen(true)} />
-          <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} onSuccess={() => handleLoginSuccess(document.getElementById('email')?.value)} />
+          <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} onSuccess={handleLoginSuccess} />
           <SignUpModal open={signUpOpen} onClose={() => setSignUpOpen(false)} onSuccess={handleSignUpSuccess} />
           <main>
             <Hero onSignUpClick={() => setSignUpOpen(true)} />

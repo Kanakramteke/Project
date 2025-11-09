@@ -49,6 +49,11 @@ app.use('/api/teams', teamRoutes);
 const eventRoutes = require('./routes/eventRoutes');
 app.use('/api/events', eventRoutes);
 
+const profileRoutes = require('./routes/profileRoutes');
+app.use('/api/profiles', profileRoutes);
+console.log('✅ Profile routes loaded');
+
+
 // MongoDB connection
 const connectDB = async () => {
     try {

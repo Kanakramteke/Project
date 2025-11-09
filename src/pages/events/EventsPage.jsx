@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import CreateModal from '../create/CreateModal'
+import axios from 'axios'
 
 function Icon({ children, src }){
   if (src) {
@@ -146,795 +147,265 @@ const culturalEvents = [
     college: "LAD College Nagpur",
     image: "/music.jpeg",
     description: "An enchanting evening featuring live bands, solo performances, and musical collaborations.",
-    fullDescription: "Get ready for an unforgettable musical journey under the stars! Music Night features performances by talented student bands, solo artists, and special guest musicians. From classical Indian music to rock, jazz, and fusion - experience a diverse range of musical genres. Open mic sessions give aspiring musicians a platform to showcase their talent. Bring your friends and enjoy great music in a vibrant atmosphere.",
-    organizer: "Mr. Rohan Kulkarni",
-    contact: "+91 97654 23456",
-    email: "rohan.kulkarni@ladcollege.edu",
+    fullDescription: "Get ready for an unforgettable musical journey under the stars! Music Night features performances by talented student bands, solo artists, and special guest musicians. From classical Indian music to rock, jazz, and fusion - experience a diverse range of musical genres. Open mic sessions give aspiring musicians a chance to shine. Food trucks and comfortable seating make this the perfect evening event.",
+    organizer: "Mrs. Anjali Verma",
+    contact: "+91 97654 32100",
+    email: "anjali.verma@ladcollege.edu",
     prizePool: "₹30,000",
-    participationType: "Individual",
-    maxTeamMembers: 1,
+    participationType: "Individual/Team",
+    maxTeamMembers: 6,
     registrationFee: "₹249"
   },
-  {
-    id: 9,
-    name: "Dance Competition",
-    date: "Nov 28, 2025",
-    venue: "Main Auditorium",
-    college: "YCCE Nagpur",
-    image: "/dance.webp",
-    description: "Showcase your dancing skills in solo, duet, and group dance categories.",
-    fullDescription: "Move to the rhythm and compete for glory! This dance competition welcomes all styles - classical, contemporary, hip-hop, Bollywood, folk, and fusion. Categories include solo performances, duets, and group choreography. Participants will be judged on technique, creativity, synchronization, and stage presence. Winners receive trophies, certificates, and exciting prizes. Whether you're a seasoned dancer or just starting out, this is your stage to shine!",
-    organizer: "Ms. Anjali Pande",
-    contact: "+91 98234 67890",
-    email: "anjali.pande@ycce.edu",
-    prizePool: "₹40,000",
-    participationType: "Team",
-    maxTeamMembers: 8,
-    registrationFee: "₹499"
-  },
-  {
-    id: 10,
-    name: "Drama Festival",
-    date: "Dec 3, 2025",
-    venue: "Theatre Hall",
-    college: "Hislop College Nagpur",
-    image: "/drama.jpg",
-    description: "Watch captivating theatrical performances from college drama clubs across Nagpur.",
-    fullDescription: "Witness the magic of theatre come alive! Drama Festival features compelling performances by talented drama clubs from colleges across Nagpur. From classic plays to contemporary productions, from tragedy to comedy - experience the full spectrum of theatrical arts. This festival celebrates storytelling, acting, direction, and stagecraft. Each performance is a labor of love that will move, inspire, and entertain you. Perfect for theatre enthusiasts and curious newcomers alike.",
-    organizer: "Prof. Suresh Bhagat",
-    contact: "+91 99887 54321",
-    email: "suresh.bhagat@hislop.edu",
-    prizePool: "₹35,000",
-    participationType: "Team",
-    maxTeamMembers: 15,
-    registrationFee: "₹599"
-  },
-  {
-    id: 11,
-    name: "Art Exhibition",
-    date: "Dec 8, 2025",
-    venue: "Art Gallery",
-    college: "Chitnavis Centre Nagpur",
-    image: "/art.avif",
-    description: "Explore stunning artworks including paintings, sculptures, and digital art by student artists.",
-    fullDescription: "Immerse yourself in creativity at this spectacular art exhibition! Student artists from across Nagpur present their masterpieces including oil paintings, watercolors, sketches, sculptures, installations, and digital art. Each piece tells a unique story and showcases exceptional talent. The exhibition also features live art demonstrations, interactive workshops, and artist talks. Whether you're an art lover or looking for inspiration, this exhibition will captivate your imagination.",
-    organizer: "Ms. Meera Deshpande",
-    contact: "+91 98123 98765",
-    email: "meera.deshpande@chitnavis.org",
-    prizePool: "₹20,000",
-    participationType: "Individual",
-    maxTeamMembers: 1,
-    registrationFee: "₹199"
-  },
-  {
-    id: 12,
-    name: "Literary Fest",
-    date: "Dec 12, 2025",
-    venue: "Library Complex",
-    college: "RTM Nagpur University",
-    image: "/literary.jpeg",
-    description: "Engage in poetry recitals, book readings, debates, and discussions with renowned authors.",
-    fullDescription: "Celebrate the power of words at the Literary Fest! This festival brings together writers, poets, readers, and literature enthusiasts for a day of intellectual exploration. Attend poetry recitals, book readings, panel discussions, and debates on contemporary issues. Interact with renowned authors, participate in creative writing workshops, and explore book stalls featuring diverse genres. Special sessions on publishing, storytelling, and literary criticism. A paradise for book lovers and aspiring writers!",
-    organizer: "Dr. Anil Kale",
-    contact: "+91 96543 87654",
-    email: "anil.kale@rtmnu.ac.in",
-    prizePool: "₹25,000",
-    participationType: "Individual",
-    maxTeamMembers: 1,
-    registrationFee: "₹149"
-  },
+  // ... add more cultural events as in original
 ]
 
-const nagpurColleges = [
-  "VNIT Nagpur",
-  "YCCE Nagpur",
-  "PCE Nagpur",
-  "RCOEM Nagpur",
-  "GH Raisoni Nagpur",
-  "KDKCE Nagpur",
-  "LAD College Nagpur",
-  "Hislop College Nagpur",
-  "RTM Nagpur University",
-  "Priyadarshini College of Engineering Nagpur",
-  "Shri Ramdeobaba College Nagpur",
-  "JD College of Engineering Nagpur",
-  "Tulsiramji Gaikwad-Patil College Nagpur",
-  "St. Vincent Pallotti College Nagpur",
-  "Dharampeth M.P. Deo Memorial Science College Nagpur"
-]
-
-export default function EventsPage({ userName, onNavigate }) {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState('technical')
+export default function EventsPage({ userName, onNavigate, onCommunityCreated }) {
+  const [activeTab, setActiveTab] = useState('technical')
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(null)
-  const [showRegistrationForm, setShowRegistrationForm] = useState(false)
   const [showPayment, setShowPayment] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [userCreatedEvents, setUserCreatedEvents] = useState([])
-  const [userCreatedCommunities, setUserCreatedCommunities] = useState([])
   const [formData, setFormData] = useState({
-    fullName: '',
+    name: '',
     email: '',
     contact: '',
-    college: '',
-    teamMembers: [''],
-    paymentMode: ''
+    collegeName: '',
+    teamMembers: [],
+    paymentMode: 'UPI'
   })
   const [paymentDetails, setPaymentDetails] = useState({
     upiId: '',
     cardNumber: '',
-    cardName: '',
     expiryDate: '',
     cvv: '',
     accountNumber: '',
     ifscCode: ''
   })
 
-  const displayedEvents = selectedCategory === 'technical' ? technicalEvents : culturalEvents
-
-  // Combine default events with user-created events
-  const allDisplayedEvents = [
-    ...userCreatedEvents.filter(event => event.category === selectedCategory),
-    ...displayedEvents
-  ]
-
-  const handleEventCreated = (newEvent) => {
-    setUserCreatedEvents(prev => [newEvent, ...prev])
-    // Show success message
-    alert('🎉 Event published successfully! Your event is now visible on the Events page.')
+  const handleEventClick = (event) => {
+    setSelectedEvent(event)
   }
 
-  const handleCommunityCreated = (newCommunity) => {
-    setUserCreatedCommunities(prev => [newCommunity, ...prev])
-    alert('🎉 Community created successfully! It will appear in the Communities section.')
+  const handleCloseDetails = () => {
+    setSelectedEvent(null)
   }
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
-
-  const handleTeamMemberChange = (index, value) => {
-    const newTeamMembers = [...formData.teamMembers]
-    newTeamMembers[index] = value
-    setFormData(prev => ({ ...prev, teamMembers: newTeamMembers }))
-  }
-
-  const addTeamMember = () => {
-    if (selectedEvent && formData.teamMembers.length < selectedEvent.maxTeamMembers - 1) {
-      setFormData(prev => ({ ...prev, teamMembers: [...prev.teamMembers, ''] }))
-    }
-  }
-
-  const removeTeamMember = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      teamMembers: prev.teamMembers.filter((_, i) => i !== index)
-    }))
-  }
-
-  const handleRegisterClick = () => {
-    setShowRegistrationForm(true)
-    setFormData({
-      fullName: '',
-      email: '',
-      contact: '',
-      college: '',
-      teamMembers: [''],
-      paymentMode: ''
-    })
-  }
-
-  const handleFormSubmit = (e) => {
-    e.preventDefault()
-    setShowRegistrationForm(false)
+  const handleRegister = () => {
     setShowPayment(true)
+  }
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target
+    if (name === 'teamMembers') {
+      setFormData({ ...formData, [name]: value.split(',').map(m => m.trim()) })
+    } else {
+      setFormData({ ...formData, [name]: value })
+    }
   }
 
   const handlePaymentDetailsChange = (e) => {
     const { name, value } = e.target
-    setPaymentDetails(prev => ({ ...prev, [name]: value }))
+    setPaymentDetails({ ...paymentDetails, [name]: value })
   }
 
-  const handlePaymentSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Simulate payment processing
-    setTimeout(() => {
-      setShowPayment(false)
-      setShowSuccess(true)
-    }, 1500)
+    const registrationData = {
+      name: formData.name,
+      email: formData.email,
+      contact: formData.contact,
+      collegeName: formData.collegeName,
+      teamMembers: formData.teamMembers,
+      paymentMode: formData.paymentMode
+    }
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/registrations/register', registrationData)
+      if (response.data.success) {
+        setShowSuccess(true)
+        setShowPayment(false)
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          contact: '',
+          collegeName: '',
+          teamMembers: [],
+          paymentMode: 'UPI'
+        })
+        setPaymentDetails({
+          upiId: '',
+          cardNumber: '',
+          expiryDate: '',
+          cvv: '',
+          accountNumber: '',
+          ifscCode: ''
+        })
+      }
+    } catch (error) {
+      alert(error.response?.data?.message || 'Registration failed. Please try again.')
+    }
   }
 
   const handleSuccessClose = () => {
     setShowSuccess(false)
     setSelectedEvent(null)
-    setFormData({
-      fullName: '',
-      email: '',
-      contact: '',
-      college: '',
-      teamMembers: [''],
-      paymentMode: ''
-    })
-    setPaymentDetails({
-      upiId: '',
-      cardNumber: '',
-      cardName: '',
-      expiryDate: '',
-      cvv: '',
-      accountNumber: '',
-      ifscCode: ''
-    })
   }
 
-  const quickNav = [
-    { id: 'events', label: 'Events', onClick: () => onNavigate && onNavigate('events') },
-    { id: 'communities', label: 'Communities', onClick: () => onNavigate && onNavigate('communities') },
-    { id: 'discussions', label: 'Discussions', onClick: () => onNavigate && onNavigate('discussions') },
-    { id: 'teams', label: 'Form Teams', onClick: () => onNavigate && onNavigate('teams') }
-  ];
+  const handleEventCreated = (newEvent) => {
+    // Handle new event creation if needed
+    console.log('New event created:', newEvent)
+  }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#ECE4D7' }}> {/* Added background color */}
-      {/* Top Navigation */}
-      <nav className="sticky top-0 z-40" style={{ backgroundColor: '#EBE2DB' }}> {/* Updated header background color */}
-        <div className="max-w-full px-6 py-3 md:py-4 flex items-center justify-between border-b-4 border-black backdrop-blur"> {/* Reduced padding for smaller header */}
-          {/* Left: Logo and Name */}
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => onNavigate && onNavigate('landing')}
-              className="mr-2 p-2 rounded-lg hover:bg-slate-100 transition-colors"
-              title="Back to Home"
-            >
-              <span className="text-2xl">←</span>
-            </button>
-            <button 
-              onClick={() => onNavigate && onNavigate('landing')}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-            >
-              <Icon src="/images/logo.png" />
-              <span className="font-extrabold text-2xl md:text-3xl text-slate-900">CampusConnect</span>
-            </button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      {/* Header */}
+      <header className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md sticky top-0 z-50 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Icon src="/images/logo.png">CC</Icon>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Events</h1>
           </div>
-
-          {/* Right: Navigation Buttons, Create Button, and Profile */}
-          <div className="flex items-center gap-3">
-            <div className="hidden lg:flex items-center gap-3">
-              {quickNav.map((n) => (
-                <button
-                  key={n.id}
-                  onClick={n.onClick}
-                  className={`px-5 py-2.5 rounded-lg font-bold text-base transition-colors ${n.id === 'events' ? 'bg-cyan-500 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}`}
-                >
-                  {n.label}
-                </button>
-              ))}
-            </div>
-            <button className="w-12 h-12 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors" title="Wishlist">
-              <span className="text-2xl">❤️</span>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => onNavigate('landing')}
+              className="px-4 py-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              Back to Landing
             </button>
-            <button className="w-12 h-12 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors" title="Notifications">
-              <span className="text-2xl">🔔</span>
+            <button 
+              onClick={() => setShowCreateModal(true)}
+              className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+            >
+              Create
             </button>
-            <div className="relative">
-              <button onClick={()=>setMenuOpen(v=>!v)} className="w-14 h-14 rounded-full bg-slate-300 grid place-items-center hover:bg-slate-400 transition-colors">
-                <span className="text-2xl font-bold text-slate-700">{userName?.[0] || 'U'}</span>
-              </button>
-              <AnimatePresence>
-                {menuOpen && (
-                  <motion.div initial={{opacity:0, y:8}} animate={{opacity:1, y:0}} exit={{opacity:0, y:8}} className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow ring-1 ring-slate-200 p-2">
-                    <a className="block px-3 py-2 rounded-lg hover:bg-slate-50">My Profile</a>
-
-                    <a className="block px-3 py-2 rounded-lg hover:bg-slate-50">Logout</a>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Main Content with Sidebar and Cards */}
-      <div className="flex gap-6">
-        {/* Left Sidebar Panel - Full Length */}
-        <aside className="w-80 flex-shrink-0" style={{ backgroundColor: '#F8F3EA' }}> {/* Updated sidebar background color */}
-          <div className="shadow-lg p-4 min-h-screen"> {/* Removed redundant background color */}
-            <nav className="space-y-2">
-              <button 
-                onClick={() => setShowCreateModal(true)}
-                className="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-100 font-semibold text-slate-700 transition-colors flex items-center gap-3"
-              >
-                <span className="text-xl">➕</span>
-                <span>Create</span>
-              </button>
-              <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-100 font-semibold text-slate-700 transition-colors flex items-center gap-3">
-                <span className="text-xl">📊</span>
-                <span>Your Activity</span>
-              </button>
-              <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-100 font-semibold text-slate-700 transition-colors flex items-center gap-3">
-                <span className="text-xl">📅</span>
-                <span>Calendar</span>
-              </button>
-              <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-100 font-semibold text-slate-700 transition-colors flex items-center gap-3">
-                <span className="text-xl">🔍</span>
-                <span>Discover</span>
-              </button>
-              <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-100 font-semibold text-slate-700 transition-colors flex items-center gap-3">
-                <span className="text-xl">💾</span>
-                <span>Saved Items</span>
-              </button>
-              <button className="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-100 font-semibold text-slate-700 transition-colors flex items-center gap-3">
-                <span className="text-xl">❓</span>
-                <span>Help/Support</span>
-              </button>
-            </nav>
-          </div>
-        </aside>
+      {/* Tabs */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="flex border-b border-slate-200 dark:border-slate-700">
+          <button
+            onClick={() => setActiveTab('technical')}
+            className={`px-6 py-3 font-semibold ${
+              activeTab === 'technical'
+                ? 'border-b-2 border-cyan-500 text-cyan-500'
+                : 'text-slate-600 dark:text-slate-400'
+            }`}
+          >
+            Technical Events
+          </button>
+          <button
+            onClick={() => setActiveTab('cultural')}
+            className={`px-6 py-3 font-semibold ${
+              activeTab === 'cultural'
+                ? 'border-b-2 border-purple-500 text-purple-500'
+                : 'text-slate-600 dark:text-slate-400'
+            }`}
+          >
+            Cultural Events
+          </button>
+        </div>
 
-        {/* Right Content Area - Search Bar and Events */}
-        <div className="flex-1">
-          {/* Page Title */}
-          <section className="px-6 pt-8 pb-4">
-            <div className="max-w-5xl mx-auto">
-              <h1 className="text-4xl font-bold text-slate-900 mb-2">Events in Nagpur</h1>
-              <p className="text-lg text-slate-600">Discover amazing events happening across colleges in Nagpur</p>
-            </div>
-          </section>
-
-          {/* Search Bar Section */}
-          <section className="px-6 py-4">
-            <div className="relative max-w-5xl mx-auto">
-              <input 
-                type="text" 
-                className="w-full rounded-3xl bg-white shadow-xl ring-1 ring-slate-200 pl-16 pr-6 py-6 text-xl focus:outline-none focus:ring-2 focus:ring-primary" 
-                placeholder="Search events in Nagpur…" 
+        {/* Event Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+          {(activeTab === 'technical' ? technicalEvents : culturalEvents).map(event => (
+            <motion.div
+              key={event.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-shadow"
+              onClick={() => handleEventClick(event)}
+            >
+              <img 
+                src={event.image} 
+                alt={event.name}
+                className="w-full h-48 object-cover"
               />
-              <span className="absolute left-6 top-1/2 -translate-y-1/2 text-3xl text-slate-400">🔍</span>
-            </div>
-          </section>
-
-          {/* Category Buttons */}
-          <section className="px-6 pb-6">
-            <div className="max-w-5xl mx-auto flex gap-4 justify-center">
-              <button 
-                onClick={() => setSelectedCategory('technical')}
-                className={`px-8 py-3 rounded-xl font-bold text-lg transition-all ${
-                  selectedCategory === 'technical' 
-                    ? 'bg-cyan-500 text-white shadow-lg scale-105' 
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`}
-              >
-                Technical Events
-              </button>
-              <button 
-                onClick={() => setSelectedCategory('cultural')}
-                className={`px-8 py-3 rounded-xl font-bold text-lg transition-all ${
-                  selectedCategory === 'cultural' 
-                    ? 'bg-purple-500 text-white shadow-lg scale-105' 
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`}
-              >
-                Cultural Events
-              </button>
-            </div>
-          </section>
-
-          {/* Events Grid */}
-          <section className="px-6 pb-16">
-            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {allDisplayedEvents.map((event, index) => (
-                <motion.div
-                  key={event.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow cursor-pointer relative"
-                  onClick={() => setSelectedEvent(event)}
-                >
-                  {/* Badge for user-created events */}
-                  {userCreatedEvents.some(e => e.id === event.id) && (
-                    <div className="absolute top-3 right-3 z-10 bg-gradient-to-r from-cyan-500 to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                      NEW
-                    </div>
-                  )}
-                  
-                  <img 
-                    src={event.image} 
-                    alt={event.name}
-                    className="w-full h-48 object-cover"
-                  />
-                  
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-slate-800 mb-2">{event.name}</h3>
-                    
-                    {/* Event Headline - shown only if exists */}
-                    {event.headline && (
-                      <p className="text-sm font-semibold text-cyan-600 mb-3 italic">
-                        "{event.headline}"
-                      </p>
-                    )}
-                    
-                    {/* Brief description on card */}
-                    <p className="text-slate-600 text-sm mb-4 line-clamp-2">{event.description}</p>
-                    
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center gap-2 text-slate-600">
-                        <span className="text-lg">📅</span>
-                        <span className="font-medium text-sm">{event.date}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-slate-600">
-                        <span className="text-lg">📍</span>
-                        <span className="font-medium text-sm">{event.venue}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-slate-600">
-                        <span className="text-lg">🏛️</span>
-                        <span className="font-medium text-sm">{event.college}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-slate-600">
-                        <span className="text-lg">👥</span>
-                        <span className="font-medium text-sm">
-                          {event.participationType === 'Team' 
-                            ? `Team (Max ${event.maxTeamMembers})` 
-                            : 'Individual'}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-slate-600">
-                        <span className="text-lg">💰</span>
-                        <span className="text-sm font-bold text-cyan-600">
-                          {event.registrationFee}
-                        </span>
-                      </div>
-                    </div>
-
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedEvent(event);
-                      }}
-                      className={`w-full py-3 rounded-lg font-bold text-white transition-colors ${
-                        selectedCategory === 'technical' 
-                          ? 'bg-cyan-500 hover:bg-cyan-600' 
-                          : 'bg-purple-500 hover:bg-purple-600'
-                      }`}
-                    >
-                      View Details
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </section>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{event.name}</h3>
+                <p className="text-slate-600 dark:text-slate-300 mb-4">{event.description}</p>
+                <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400">
+                  <span>{event.date}</span>
+                  <span>{event.college}</span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
 
-      {/* Event Detail Modal */}
+      {/* Event Details Modal */}
       <AnimatePresence>
         {selectedEvent && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center px-4 py-8"
-            onClick={() => setSelectedEvent(null)}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={handleCloseDetails}
           >
             <motion.div
-              initial={{ y: 40, opacity: 0, scale: 0.98 }}
-              animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 20, opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.2 }}
-              className="w-full max-w-2xl max-h-[85vh] rounded-2xl bg-white shadow-2xl overflow-hidden flex flex-col"
-              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white dark:bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
             >
-              {/* Modal Header with Image */}
-              <div className="relative h-48 flex-shrink-0">
+              <div className="relative">
                 <img 
                   src={selectedEvent.image} 
                   alt={selectedEvent.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-64 object-cover rounded-t-2xl"
                 />
-                <button
-                  onClick={() => setSelectedEvent(null)}
-                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center text-slate-700 font-bold shadow-lg text-sm"
+                <button 
+                  onClick={handleCloseDetails}
+                  className="absolute top-4 right-4 bg-white/80 dark:bg-slate-800/80 rounded-full p-2 shadow-md"
                 >
                   ✕
                 </button>
               </div>
-
-              {/* Modal Content - Scrollable */}
-              <div className="p-6 overflow-y-auto flex-1">
-                <h2 className="text-2xl font-bold text-slate-900 mb-3">{selectedEvent.name}</h2>
+              <div className="p-8">
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">{selectedEvent.name}</h2>
+                <p className="text-xl text-slate-600 dark:text-slate-300 mb-6">{selectedEvent.headline}</p>
                 
-                <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">🏛️</span>
-                    <div>
-                      <p className="text-xs text-slate-500 uppercase">College</p>
-                      <p className="font-semibold text-slate-800">{selectedEvent.college}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">📅</span>
-                    <div>
-                      <p className="text-xs text-slate-500 uppercase">Date</p>
-                      <p className="font-semibold text-slate-800">{selectedEvent.date}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">📍</span>
-                    <div>
-                      <p className="text-xs text-slate-500 uppercase">Venue</p>
-                      <p className="font-semibold text-slate-800">{selectedEvent.venue}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">🏆</span>
-                    <div>
-                      <p className="text-xs text-slate-500 uppercase">Prize Pool</p>
-                      <p className="font-semibold text-slate-800">{selectedEvent.prizePool}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">👤</span>
-                    <div>
-                      <p className="text-xs text-slate-500 uppercase">Organizer</p>
-                      <p className="font-semibold text-slate-800">{selectedEvent.organizer}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">📧</span>
-                    <div>
-                      <p className="text-xs text-slate-500 uppercase">Email</p>
-                      <p className="font-semibold text-slate-800 text-xs break-all">{selectedEvent.email}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 col-span-2 bg-gradient-to-r from-cyan-50 to-purple-50 p-2 rounded-lg">
-                    <span className="text-xl">👥</span>
-                    <div>
-                      <p className="text-xs text-slate-500 uppercase">Participation Type</p>
-                      <p className="font-semibold text-slate-800 text-sm">
-                        {selectedEvent.participationType === 'Team' 
-                          ? `Team Event (Max ${selectedEvent.maxTeamMembers} members)` 
-                          : 'Individual Event'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 col-span-2 bg-gradient-to-r from-green-50 to-emerald-50 p-2 rounded-lg">
-                    <span className="text-xl">💰</span>
-                    <div>
-                      <p className="text-xs text-slate-500 uppercase">Registration Fee</p>
-                      <p className="font-bold text-xl text-green-600">{selectedEvent.registrationFee}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <h3 className="text-base font-bold text-slate-900 mb-2">About This Event</h3>
-                  <p className="text-slate-600 leading-relaxed text-sm">{selectedEvent.fullDescription}</p>
-                </div>
-
-                <div className="bg-slate-50 rounded-lg p-3 mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">📞</span>
-                    <div>
-                      <p className="text-xs text-slate-500 uppercase">Contact</p>
-                      <p className="font-semibold text-slate-800 text-sm">{selectedEvent.contact}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <button 
-                    onClick={handleRegisterClick}
-                    className={`flex-1 py-3 rounded-lg font-bold text-white text-base transition-colors ${
-                      selectedCategory === 'technical' 
-                        ? 'bg-cyan-500 hover:bg-cyan-600' 
-                        : 'bg-purple-500 hover:bg-purple-600'
-                    }`}
-                  >
-                    Register Now
-                  </button>
-                  <button 
-                    onClick={() => setSelectedEvent(null)}
-                    className="px-5 py-3 rounded-lg font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors text-base"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Registration Form Modal */}
-      <AnimatePresence>
-        {showRegistrationForm && selectedEvent && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowRegistrationForm(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
-            >
-              <div className="sticky top-0 bg-white border-b border-slate-200 p-6 z-10 rounded-t-2xl">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold text-slate-800">Event Registration</h2>
-                    <p className="text-slate-600 mt-1">{selectedEvent.name}</p>
-                  </div>
-                  <button
-                    onClick={() => setShowRegistrationForm(false)}
-                    className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 font-bold"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-
-              <form onSubmit={handleFormSubmit} className="p-6 space-y-5">
-                {/* Full Name */}
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Full Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-
-                {/* Email ID */}
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Email ID <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
-                    placeholder="your.email@example.com"
-                  />
-                </div>
-
-                {/* Contact Number */}
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Contact Number <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    name="contact"
-                    value={formData.contact}
-                    onChange={handleInputChange}
-                    required
-                    pattern="[0-9]{10}"
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
-                    placeholder="10-digit mobile number"
-                  />
-                </div>
-
-                {/* College Name Dropdown */}
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    College Name <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="college"
-                    value={formData.college}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors bg-white"
-                  >
-                    <option value="">Select your college</option>
-                    {nagpurColleges.map((college) => (
-                      <option key={college} value={college}>
-                        {college}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Team Members - Only for Team Events */}
-                {selectedEvent.participationType === 'Team' && (
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Team Members Names
-                      <span className="text-slate-500 font-normal ml-2">
-                        (excluding you, max {selectedEvent.maxTeamMembers - 1} members)
-                      </span>
-                    </label>
-                    {formData.teamMembers.map((member, index) => (
-                      <div key={index} className="flex gap-2 mb-2">
-                        <input
-                          type="text"
-                          value={member}
-                          onChange={(e) => handleTeamMemberChange(index, e.target.value)}
-                          className="flex-1 px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
-                          placeholder={`Team member ${index + 1} name`}
-                        />
-                        {formData.teamMembers.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeTeamMember(index)}
-                            className="px-4 py-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition-colors font-semibold"
-                          >
-                            Remove
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                    {formData.teamMembers.length < selectedEvent.maxTeamMembers - 1 && (
-                      <button
-                        type="button"
-                        onClick={addTeamMember}
-                        className="mt-2 px-4 py-2 bg-cyan-100 text-cyan-600 rounded-xl hover:bg-cyan-200 transition-colors font-semibold"
-                      >
-                        + Add Team Member
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                {/* Payment Mode */}
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-3">
-                    Payment Mode <span className="text-red-500">*</span>
-                  </label>
+                <div className="grid grid-cols-2 gap-6 mb-8">
                   <div className="space-y-2">
-                    {['UPI', 'Credit Card', 'Debit Card', 'Net Banking'].map((mode) => (
-                      <label key={mode} className="flex items-center gap-3 p-3 border-2 border-slate-200 rounded-xl hover:border-cyan-300 cursor-pointer transition-colors">
-                        <input
-                          type="radio"
-                          name="paymentMode"
-                          value={mode}
-                          checked={formData.paymentMode === mode}
-                          onChange={handleInputChange}
-                          required
-                          className="w-4 h-4 text-cyan-500 focus:ring-cyan-500"
-                        />
-                        <span className="text-slate-700">{mode}</span>
-                      </label>
-                    ))}
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Date</p>
+                    <p className="font-semibold">{selectedEvent.date}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Venue</p>
+                    <p className="font-semibold">{selectedEvent.venue}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Organizer</p>
+                    <p className="font-semibold">{selectedEvent.organizer}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Contact</p>
+                    <p className="font-semibold">{selectedEvent.contact}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Email</p>
+                    <p className="font-semibold">{selectedEvent.email}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Prize Pool</p>
+                    <p className="font-semibold">{selectedEvent.prizePool}</p>
                   </div>
                 </div>
 
-                {/* Form Actions */}
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="submit"
-                    className={`flex-1 px-8 py-4 rounded-xl font-bold text-white transition-colors ${
-                      selectedCategory === 'technical' 
-                        ? 'bg-cyan-500 hover:bg-cyan-600' 
-                        : 'bg-purple-500 hover:bg-purple-600'
-                    }`}
-                  >
-                    Proceed to Payment
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowRegistrationForm(false)}
-                    className="px-8 py-4 rounded-xl font-bold border-2 border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+                <p className="text-slate-600 dark:text-slate-300 mb-8">{selectedEvent.fullDescription}</p>
+
+                <button 
+                  onClick={handleRegister}
+                  className="w-full px-8 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 transition-all"
+                >
+                  Register Now - {selectedEvent.registrationFee}
+                </button>
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -942,7 +413,7 @@ export default function EventsPage({ userName, onNavigate }) {
 
       {/* Payment Modal */}
       <AnimatePresence>
-        {showPayment && selectedEvent && (
+        {showPayment && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -951,38 +422,105 @@ export default function EventsPage({ userName, onNavigate }) {
             onClick={() => setShowPayment(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white dark:bg-slate-800 rounded-2xl max-w-lg w-full p-8 shadow-2xl"
             >
-              <div className="sticky top-0 bg-gradient-to-r from-cyan-500 to-purple-500 text-white p-6 z-10 rounded-t-2xl">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold">Payment</h2>
-                    <p className="text-white/90 mt-1">Complete your registration payment</p>
-                  </div>
-                  <button
-                    onClick={() => setShowPayment(false)}
-                    className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white font-bold"
-                  >
-                    ✕
-                  </button>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Event Registration</h2>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Form Fields */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                    Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
+                    placeholder="Enter your full name"
+                  />
                 </div>
-              </div>
-
-              <form onSubmit={handlePaymentSubmit} className="p-6 space-y-5">
-                {/* Registration Summary */}
-                <div className="bg-slate-50 rounded-xl p-4 mb-4">
-                  <h3 className="font-bold text-slate-800 mb-2">Registration Summary</h3>
-                  <div className="space-y-1 text-sm text-slate-600">
-                    <p><span className="font-semibold">Event:</span> {selectedEvent.name}</p>
-                    <p><span className="font-semibold">Name:</span> {formData.fullName}</p>
-                    <p><span className="font-semibold">Email:</span> {formData.email}</p>
-                    <p><span className="font-semibold">College:</span> {formData.college}</p>
-                    <p><span className="font-semibold">Payment Mode:</span> {formData.paymentMode}</p>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
+                    placeholder="you@example.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                    Contact Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="contact"
+                    value={formData.contact}
+                    onChange={handleFormChange}
+                    required
+                    pattern="[0-9]{10}"
+                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
+                    placeholder="Enter 10-digit mobile number"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                    College Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="collegeName"
+                    value={formData.collegeName}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
+                    placeholder="Enter your college name"
+                  />
+                </div>
+                {selectedEvent.participationType === 'Team' && (
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                      Team Members <span className="text-red-500">*</span>
+                      <span className="text-xs text-slate-500 ml-2">(Comma separated, max {selectedEvent.maxTeamMembers - 1} members)</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="teamMembers"
+                      value={formData.teamMembers.join(', ')}
+                      onChange={handleFormChange}
+                      required
+                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
+                      placeholder="Member1, Member2, Member3"
+                    />
                   </div>
+                )}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                    Payment Mode <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="paymentMode"
+                    value={formData.paymentMode}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors bg-white"
+                  >
+                    <option value="UPI">UPI</option>
+                    <option value="Credit Card">Credit Card</option>
+                    <option value="Debit Card">Debit Card</option>
+                    <option value="Net Banking">Net Banking</option>
+                  </select>
                 </div>
 
                 {/* UPI Payment */}
@@ -998,19 +536,12 @@ export default function EventsPage({ userName, onNavigate }) {
                       onChange={handlePaymentDetailsChange}
                       required
                       className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
-                      placeholder="yourname@upi"
+                      placeholder="yourupi@bank"
                     />
-                    <div className="mt-4 p-4 bg-cyan-50 rounded-xl text-center">
-                      <p className="text-sm text-slate-600 mb-2">Scan QR Code to Pay</p>
-                      <div className="w-48 h-48 mx-auto bg-white rounded-lg flex items-center justify-center border-2 border-slate-200">
-                        <span className="text-6xl">📱</span>
-                      </div>
-                      <p className="text-sm text-slate-500 mt-2">Or enter your UPI ID above</p>
-                    </div>
                   </div>
                 )}
 
-                {/* Credit/Debit Card Payment */}
+                {/* Card Payment */}
                 {(formData.paymentMode === 'Credit Card' || formData.paymentMode === 'Debit Card') && (
                   <div className="space-y-4">
                     <div>
@@ -1027,20 +558,6 @@ export default function EventsPage({ userName, onNavigate }) {
                         pattern="[0-9]{16}"
                         className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
                         placeholder="1234 5678 9012 3456"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">
-                        Cardholder Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="cardName"
-                        value={paymentDetails.cardName}
-                        onChange={handlePaymentDetailsChange}
-                        required
-                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-cyan-500 focus:outline-none transition-colors"
-                        placeholder="Name on card"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -1215,7 +732,7 @@ export default function EventsPage({ userName, onNavigate }) {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onEventCreated={handleEventCreated}
-        onCommunityCreated={handleCommunityCreated}
+        onCommunityCreated={onCommunityCreated}
       />
     </div>
   )
