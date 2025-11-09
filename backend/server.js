@@ -37,6 +37,18 @@ app.use((req, res, next) => {
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes);
 
+const registrationRoutes = require('./routes/registrationRoutes');
+app.use('/api/registrations', registrationRoutes);
+
+const discussionRoutes = require('./routes/discussionRoutes');
+app.use('/api/discussions', discussionRoutes); 
+
+const teamRoutes = require('./routes/teamRoutes');
+app.use('/api/teams', teamRoutes);
+
+const eventRoutes = require('./routes/eventRoutes');
+app.use('/api/events', eventRoutes);
+
 // MongoDB connection
 const connectDB = async () => {
     try {
